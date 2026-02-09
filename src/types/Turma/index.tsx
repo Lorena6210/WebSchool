@@ -16,6 +16,7 @@ export interface Disciplina {
 }
 
 export interface TurmaCompleta {
+  professores: any;
   Id: number;
   Nome: string;
   disciplinas: Disciplina[];

@@ -1,4 +1,4 @@
-// mockTurmas.ts
+// mockTurmas.ts - Arquivo corrigido para evitar undefined e garantir serialização JSON
 import { TurmaCompleta } from "@/types/Turma"; // Ajuste o caminho se necessário
 
 export const mockTurmas: TurmaCompleta[] = [
@@ -12,8 +12,7 @@ export const mockTurmas: TurmaCompleta[] = [
         Nota: "8.5",
         progresso: 75,
         frequencia: 90, // Novo: Porcentagem de frequência
-        descricao:
-          "Estudo de equações, funções e estruturas algébricas básicas.",
+        descricao: "Estudo de equações, funções e estruturas algébricas básicas.",
         topicos: [
           "Equações lineares",
           "Funções quadráticas",
@@ -63,5 +62,8 @@ export const mockTurmas: TurmaCompleta[] = [
         ],
       },
     ],
+    professores: [1],  // Corrigido: Array de IDs (não undefined) para serialização JSON
   },
 ];
+
+// Nota: O objeto 'data' foi removido daqui, pois parece duplicado do mockUsuarios.ts. Se precisar, importe de lá.

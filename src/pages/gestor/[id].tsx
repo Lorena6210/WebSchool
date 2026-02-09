@@ -1,7 +1,7 @@
 // pages/gestor/[id].tsx - Página dinâmica para gestores
 import { GetServerSideProps } from "next";
-import ManagerPage from "../../Views/Manager";
-import { data } from "@/data";
+import ManagerPage from "../../Views/manager";
+import { data } from "@/mock/mockUsuarios";
 import BasePage from "@/components/BasePage";
 import Root from '../../components/Root';
 
@@ -17,11 +17,9 @@ interface Props {
 
 export default function PaginaGestor({ usuario }: Props) {
   return (
-    <Root>
-      <BasePage usuario={usuario} titulo="Painel do Gestor">
-        <ManagerPage usuario={usuario} />
-      </BasePage>
-    </Root>
+    <BasePage usuario={usuario} titulo="Painel do Gestor">
+      <ManagerPage usuario={usuario} />
+    </BasePage>
   );
 }
 
@@ -29,7 +27,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   const { id } = context.query;
   if (!id || Array.isArray(id)) return { notFound: true };
   const idGestor = Number(id);
-  const gestor = data.usuarios.managers.find((u) => u.id === idGestor);
+  const gestor = data.usuarios.manager.find((u) => u.id === idGestor);
   if (!gestor) return { notFound: true };
   return {
     props: {

@@ -1,8 +1,9 @@
-// Views/Teacher.tsx - Componente para a página do professor
+// Views/teachers/index.tsx - Componente corrigido para a página do professor
 import React, { useState, useEffect } from "react";
 import { Box, Card, Typography, Grid, List, ListItem, ListItemText } from "@mui/material";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { TurmaCompleta } from "@/types/Turma";
+import { data } from "@/mock/mockUsuarios";
 import { mockTurmas } from "@/mock/mockTurmas";
 
 interface Usuario {
@@ -21,14 +22,14 @@ export default function TeacherPage({ usuario, turmas = mockTurmas }: TeacherPag
 
   useEffect(() => {
     // Filtrar turmas onde o professor leciona (assumindo que o ID do professor está nas turmas)
-    const turmasFiltradas = turmas.filter(turma => turma.professores.includes(usuario.Id));
+    const turmasFiltradas = turmas.filter(turma => turma.professores && turma.professores.includes(usuario.Id));
     setTurmasProfessor(turmasFiltradas);
   }, [turmas, usuario.Id]);
 
   return (
-    <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1024px" }}>
-      {turmasProfessor.map((turma, i) => (
-        <Grid item xs={12} sm={6} md={4} key={turma.id}>
+    <Grid container spacing={4} justifyContent="left" height={"67.2vh"}>
+      {turmasProfessor.map((turma) => (
+        <Grid item xs={12} sm={6} md={4} key={turma.Id}>
           <Card
             sx={{
               backgroundColor: "rgba(255,255,255,0.85)",
@@ -80,18 +81,20 @@ export default function TeacherPage({ usuario, turmas = mockTurmas }: TeacherPag
             </Box>
 
             <Typography variant="h6" sx={{ mb: "18px", color: "#222", fontWeight: "bold" }}>
-              {turma.nome}
+              {turma.Nome}
             </Typography>
 
             <Typography variant="body2" sx={{ color: "#666", mb: 1 }}>
               Disciplinas:
             </Typography>
             <List dense>
-              {turma.disciplinas.map((discId) => (
-                <ListItem key={discId} sx={{ py: 0 }}>
-                  <ListItemText primary={`Disciplina ${discId}`} sx={{ textAlign: "center" }} />
-                </ListItem>
-              ))}
+              {turma.disciplinas.map((disciplina) => {
+                return (
+                  <ListItem key={disciplina.Id} sx={{ py: 0 }}>
+                    <ListItemText primary={disciplina.Nome} sx={{ textAlign: "center" }} />
+                  </ListItem>
+                );
+              })}
             </List>
           </Card>
         </Grid>

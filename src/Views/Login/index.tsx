@@ -1,4 +1,3 @@
-// Views/Login.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -51,21 +50,22 @@ export default function Login({ usuariosProp }: LoginProps) {
 
   const validateRA = (ra: string) => /^RA\d+$/i.test(ra);
 
+
   const handleLogin = () => {
-  setError("");
+    setError("");
     if (!campoPrincipal.trim() || !password.trim()) {
       setError("Por favor, preencha todos os campos.");
       return;
     }
-    if (tipo === "students" && !validateRA(campoPrincipal)) {
+    if (tipo === "aluno" && !validateRA(campoPrincipal)) {
       setError("RA inválido. Ex: RA1003");
       return;
     }
-    let usuarioEncontrado: Usuario | undefined;  // Corrigido: Adicionado "undefined"
+    let usuarioEncontrado: Usuario | undefined;  // Corrigido: Adicionado "undefined" para tipagem correta
     switch (tipo) {
       case "aluno":
-        usuarioEncontrado = usuariosProp.alunos.find(  // Corrigido: "students" → "alunos"
-          (u) => u.ra?.toLowerCase() === campoPrincipal.toLowerCase()  // Corrigido: "RA" → "ra"
+        usuarioEncontrado = usuariosProp.alunos.find(  // Corrigido: "students" → "alunos" (já estava, mas confirmado)
+          (u) => u.ra?.toLowerCase() === campoPrincipal.toLowerCase()  // Corrigido: "RA" → "ra" (já estava)
         );
         break;
       case "professor":
@@ -92,8 +92,51 @@ export default function Login({ usuariosProp }: LoginProps) {
       setError("Senha incorreta.");
       return;
     }
-    router.push(`/${tipo}/${usuarioEncontrado.id}`);  // Corrigido: "Id" → "id"
+    router.push(`/${tipo}/${usuarioEncontrado.id}`);  // Confirmado: Usa ${usuarioEncontrado.id}
   };
+  // const handleLogin = () => {
+  //   setError("");
+  //   if (!campoPrincipal.trim() || !password.trim()) {
+  //     setError("Por favor, preencha todos os campos.");
+  //     return;
+  //   }
+  //   if (tipo === "aluno" && !validateRA(campoPrincipal)) {
+  //     setError("RA inválido. Ex: RA1003");
+  //     return;
+  //   }
+  //   let usuarioEncontrado: Usuario | undefined;  // Corrigido: Adicionado "undefined" para tipagem correta
+  //   switch (tipo) {
+  //     case "aluno":
+  //       usuarioEncontrado = usuariosProp.alunos.find(  // Corrigido: "students" → "alunos" (já estava, mas confirmado)
+  //         (u) => u.ra?.toLowerCase() === campoPrincipal.toLowerCase()  // Corrigido: "RA" → "ra" (já estava)
+  //       );
+  //       break;
+  //     case "professor":
+  //       usuarioEncontrado = usuariosProp.professores.find(
+  //         (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
+  //       );
+  //       break;
+  //     case "responsavel":
+  //       usuarioEncontrado = usuariosProp.responsaveis.find(
+  //         (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
+  //       );
+  //       break;
+  //     case "gestor":
+  //       usuarioEncontrado = usuariosProp.gestores.find(
+  //         (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
+  //       );
+  //       break;
+  //   }
+  //   if (!usuarioEncontrado) {
+  //     setError(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)} não encontrado.`);
+  //     return;
+  //   }
+  //   if (usuarioEncontrado.senha !== password) {
+  //     setError("Senha incorreta.");
+  //     return;
+  //   }
+  //   router.push(`/${tipo}/${usuarioEncontrado.id}`);  // Corrigido: "Id" → "id" (já estava)
+  // };
 
   // Renderização do campo dinâmico
   const renderCampoPrincipal = () => {
@@ -148,11 +191,15 @@ export default function Login({ usuariosProp }: LoginProps) {
 
   return (
     <Box
+      width={'100.9%'}
+      marginTop="-7.9px"
+      marginLeft="-6px"
+      height={"99.01vh"}
       sx={{
-        minHeight: "100vh",
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         background: "linear-gradient(to bottom right, #dbeafe, #fce7f3, #fef3c7)",
+        // Removido estilos não relacionados como .refInputDate1, pois parecem desnecessários aqui
       }}
     >
       {/* Lado esquerdo */}
@@ -168,7 +215,7 @@ export default function Login({ usuariosProp }: LoginProps) {
         {/* Mascote/Ilustração */}
         <Box
           component="img"
-          src="/mascote-escola.svg"
+          src="../../"
           alt="Mascote estudando"
           sx={{
             width: 320,

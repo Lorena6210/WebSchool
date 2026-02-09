@@ -16,34 +16,12 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
 
   return (
     <Box
-        flexDir="column"
-        justify="space-between"
-        maxWidth={"1024px"}
-        width={"100%"}
+        width={"97.74%"}
         minW="100px"
         marginTop="-8px"
-        marginBottom="50px"
+        marginLeft="-7.8px"
         fontFamily= "Inter, Arial, sans-serif"
         background ="linear-gradient(120deg, #0dae6d 0%, #cfdef3 100%)"
-        flexDirectio n = "column"
-        sx={{
-          ".refInputDate1": {
-            position: "relative",
-            cursor: "pointer",
-            boxSizing: "border-box",
-            lineHeight: "normal !important",
-          },
-          ".firstDate::-webkit-calendar-picker-indicator": {
-            position: "absolute",
-            right: "0",
-            width: "100%",
-            height: "100%",
-            margin: "0",
-            padding: "0",
-            opacity: "0",
-            cursor: "pointer",
-          },
-        }}
     >
       <Navbar usuario={usuario} menuItems={menuItems} />
       <Box
@@ -53,9 +31,11 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
           overflowY: "auto",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          maxWidth:"1024px",
+          // alignItems: "center",
+          // maxWidth:"1024px",
           width:"100%",
+          // height:"90vh",
+          background: "linear-gradient(to bottom right, #dbeafe, #fce7f3, #fef3c7)",
         }}
       >
         <Typography
@@ -69,6 +49,7 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
             mb: "32px",
             fontWeight: 700,
             boxShadow: "0 4px 24px rgba(56,182,255,0.10)",
+            
           }}
         >
           {titulo}

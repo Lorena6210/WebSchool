@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Card, Typography, Grid, List, ListItem, ListItemText } from "@mui/material";
 import { FaUserTie } from "react-icons/fa";
-import { data } from "@/data";  // Para acessar logs ou controle
+import { data } from "@/mock/mockUsuarios";  // Para acessar logs ou controle
 
 interface Usuario {
   Nome: string;
@@ -19,12 +19,12 @@ export default function ManagerPage({ usuario }: ManagerPageProps) {
 
   useEffect(() => {
     // Filtrar logs do gestor (assumindo que logs estão no data.gestores)
-    const gestor = data.usuarios.managers.find(g => g.id === usuario.Id);
+    const gestor = data.usuarios.manager.find(g => g.id === usuario.Id);
     setLogs(gestor?.logs ?? []);
   }, [usuario.Id]);
 
   return (
-    <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1024px" }}>
+    <Grid container spacing={4} justifyContent="left" height={"67.2vh"}>
       <Grid item xs={12}>
         <Card
           sx={{

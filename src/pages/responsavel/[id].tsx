@@ -1,7 +1,7 @@
 // pages/responsavel/[id].tsx - Página dinâmica para responsáveis
 import { GetServerSideProps } from "next";
-import ResponsiblePage from "../../Views/Responsible";
-import { data } from "@/data";
+import ResponsiblePage from "../../Views/responsible";
+import { data } from "@/mock/mockUsuarios";
 import BasePage from "@/components/BasePage";
 import Root from '../../components/Root';
 
@@ -17,11 +17,10 @@ interface Props {
 
 export default function PaginaResponsavel({ usuario }: Props) {
   return (
-    <Root>
-      <BasePage usuario={usuario} titulo="Dados do Responsável">
-        <ResponsiblePage usuario={usuario} />
-      </BasePage>
-    </Root>
+    <BasePage usuario={usuario} titulo="Dados do Responsável">
+      <ResponsiblePage usuario={usuario} />
+    </BasePage>
+
   );
 }
 

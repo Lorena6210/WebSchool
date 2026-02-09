@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Card, Typography, Grid, List, ListItem, ListItemText } from "@mui/material";
 import { FaUserShield } from "react-icons/fa";
-import { data } from "@/data";  // Para acessar alunos e permissões
+import { data } from "@/mock/mockUsuarios";  // Para acessar alunos e permissões
 
 interface Usuario {
   Nome: string;
@@ -26,7 +26,7 @@ export default function ResponsiblePage({ usuario }: ResponsiblePageProps) {
   }, [usuario.Id]);
 
   return (
-    <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1024px" }}>
+    <Grid container spacing={4} justifyContent="left" height={"67.2vh"}>
       <Grid item xs={12}>
         <Card
           sx={{

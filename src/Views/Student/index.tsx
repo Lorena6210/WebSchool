@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Box, Card, LinearProgress, Typography, Badge, Grid } from "@mui/material";
 import { FaBookOpen } from "react-icons/fa";
 import { TurmaCompleta, Disciplina } from "@/types/Turma";
-import BasePage from "@/components/BasePage";
 import { mockTurmas } from "@/mock/mockTurmas";
 
 interface Usuario {
@@ -25,7 +24,6 @@ export default function AulaPage({ usuario, turmas = mockTurmas }: AlunoPageProp
   }, [turma]);
 
   return (
-    <BasePage usuario={usuario} titulo={turma?.Nome || "Turma"}>
       <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1024px" }}>
         {disciplinas.map((disciplina, i) => (
           <Grid item xs={12} sm={6} md={4} key={disciplina.Id}>
@@ -120,6 +118,5 @@ export default function AulaPage({ usuario, turmas = mockTurmas }: AlunoPageProp
           </Grid>
         ))}
       </Grid>
-    </BasePage>
   );
 }

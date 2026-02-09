@@ -1,17 +1,14 @@
-// Importações necessárias
-import React from 'react';
-import { useRouter } from 'next/navigation'; // Para o router
-import Navbar from '../views/index'; // Caminho para o componente Navbar
-import { getMenuByRole } from '../index'; // Caminho para a função getMenuByRole
+import React from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "../views";
+import { getMenuByRole } from "../index";
 
-// Interface para o usuário (ajuste conforme necessário)
 interface Usuario {
   Nome: string;
   Id: number;
-  Role: string; // Adicione o role ao usuário (ex.: "ALUNO", "PROFESSOR", etc.)
+  Role: string;
 }
 
-// Componente pai que usa a Navbar
 interface LayoutProps {
   usuario: Usuario;
   children: React.ReactNode;
@@ -19,18 +16,33 @@ interface LayoutProps {
 
 export default function Layout({ usuario, children }: LayoutProps) {
   const router = useRouter();
-  
-  // Gera os menuItems baseados no role do usuário
   const menuItems = getMenuByRole(usuario.Role, router);
-  
+
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Navbar lateral */}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Navbar no TOPO */}
       <Navbar usuario={usuario} menuItems={menuItems} />
-      
-      {/* Conteúdo principal */}
-      <main style={{ flex: 1, padding: '20px' }}>
-        {children}
+
+      {/* Conteúdo */}
+      <main
+        style={{
+          flex: 1,
+          padding: "24px 16px",
+          background: "#f4f9fb",
+          display: "flex",
+          justifyContent: "center",
+          width:"1024px"
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "1024px", flexDirection:"column" }}>
+          {children}
+        </div>
       </main>
     </div>
   );

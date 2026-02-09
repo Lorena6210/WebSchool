@@ -15,22 +15,22 @@ import {
   CircularProgress,
   Grid,
   Paper,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
-import { FaUserGraduate, FaChalkboardTeacher, FaUserShield, FaUserTie } from "react-icons/fa";
-import {IconButton, InputAdornment} from"@mui/material";
-import { FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaUserGraduate, FaChalkboardTeacher, FaUserShield, FaUserTie, FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface Usuario {
-  Id: number;
-  Nome: string;
-  RA?: string;
-  Email?: string;
-  Status: string;
-  Senha?: string;
+  id: number;  // Padronizado para lowercase
+  nome: string;
+  ra?: string;
+  email?: string;
+  status: string;
+  senha?: string;
 }
 
 interface Dados {
-  alunos: Usuario[];
+  alunos: Usuario[];  // Padronizado para português
   professores: Usuario[];
   responsaveis: Usuario[];
   gestores: Usuario[];
@@ -44,44 +44,43 @@ export default function Login({ usuariosProp }: LoginProps) {
   const router = useRouter();
   const [campoPrincipal, setCampoPrincipal] = useState("");
   const [password, setPassword] = useState("");
-  const [tipo, setTipo] = useState("aluno");
+  const [tipo, setTipo] = useState("aluno");  // Corrigido: "studants" → "aluno" (padronizado português)
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
-  const validateRA = (RA: string) => /^RA\d+$/i.test(RA);
+  const validateRA = (ra: string) => /^RA\d+$/i.test(ra);
 
   const handleLogin = () => {
-    setError("");
+  setError("");
     if (!campoPrincipal.trim() || !password.trim()) {
       setError("Por favor, preencha todos os campos.");
       return;
     }
-    if (tipo === "aluno" && !validateRA(campoPrincipal)) {
+    if (tipo === "students" && !validateRA(campoPrincipal)) {
       setError("RA inválido. Ex: RA1003");
       return;
     }
-    let usuarioEncontrado: Usuario | undefined;
+    let usuarioEncontrado: Usuario | undefined;  // Corrigido: Adicionado "undefined"
     switch (tipo) {
-      case "students":
-        usuarioEncontrado = usuariosProp.alunos.find(
-          (u) => u.RA?.toLowerCase() === campoPrincipal.toLowerCase()
+      case "aluno":
+        usuarioEncontrado = usuariosProp.alunos.find(  // Corrigido: "students" → "alunos"
+          (u) => u.ra?.toLowerCase() === campoPrincipal.toLowerCase()  // Corrigido: "RA" → "ra"
         );
         break;
-      case "teachers":
+      case "professor":
         usuarioEncontrado = usuariosProp.professores.find(
-          (u) => u.Email?.toLowerCase() === campoPrincipal.toLowerCase()
+          (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
         );
         break;
-      case "responsible":
-        // Ajustado para usar apenas Email (removido RA, pois não existe no JSON para responsáveis)
+      case "responsavel":
         usuarioEncontrado = usuariosProp.responsaveis.find(
-          (u) => u.Email?.toLowerCase() === campoPrincipal.toLowerCase()
+          (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
         );
         break;
-      case "manager":
+      case "gestor":
         usuarioEncontrado = usuariosProp.gestores.find(
-          (u) => u.Email?.toLowerCase() === campoPrincipal.toLowerCase()
+          (u) => u.email?.toLowerCase() === campoPrincipal.toLowerCase()
         );
         break;
     }
@@ -89,11 +88,11 @@ export default function Login({ usuariosProp }: LoginProps) {
       setError(`${tipo.charAt(0).toUpperCase() + tipo.slice(1)} não encontrado.`);
       return;
     }
-    if (usuarioEncontrado.Senha !== password) {
+    if (usuarioEncontrado.senha !== password) {
       setError("Senha incorreta.");
       return;
     }
-    router.push(`/${tipo}/${usuarioEncontrado.Id}`);
+    router.push(`/${tipo}/${usuarioEncontrado.id}`);  // Corrigido: "Id" → "id"
   };
 
   // Renderização do campo dinâmico
@@ -105,7 +104,6 @@ export default function Login({ usuariosProp }: LoginProps) {
         case "professor":
           return { label: "Email Institucional", placeholder: "professor@escola.com" };
         case "responsavel":
-          // Ajustado para Email apenas
           return { label: "Email", placeholder: "responsavel@escola.com" };
         case "gestor":
           return { label: "Email Administrativo", placeholder: "gestor@escola.com" };
@@ -233,7 +231,7 @@ export default function Login({ usuariosProp }: LoginProps) {
           {renderCampoPrincipal()}
           <TextField
             fullWidth
-            type={showPassword ? "text" :"password"}
+            type={showPassword ? "text" : "password"}
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -245,18 +243,18 @@ export default function Login({ usuariosProp }: LoginProps) {
                 borderRadius: 3,
               },
             }}
-            InputProps = {{
+            InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
                     onClick={() => setShowPassword(!showPassword)}
                     edge="end"
-                    >
-                      {showPassword? <FaEyeSlash/> : <FaEye/>}
-                    </IconButton>
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </IconButton>
                 </InputAdornment>
-              )
-            }} 
+              ),
+            }}
           />
           <Typography
             component="a"

@@ -16,16 +16,34 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
 
   return (
     <Box
-      sx={{
-        width: "210vh",
-        minHeight: "99.9vh",
-        position: "static",
-        mx: "auto",
-        mt: "-10px",
-        fontFamily: "Inter, Arial, sans-serif",
-        background: "linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%)",
-        display: "flex",
-      }}
+        flexDir="column"
+        justify="space-between"
+        maxWidth={"1024px"}
+        width={"100%"}
+        minW="100px"
+        marginTop="-8px"
+        marginBottom="50px"
+        fontFamily= "Inter, Arial, sans-serif"
+        background ="linear-gradient(120deg, #0dae6d 0%, #cfdef3 100%)"
+        flexDirectio n = "column"
+        sx={{
+          ".refInputDate1": {
+            position: "relative",
+            cursor: "pointer",
+            boxSizing: "border-box",
+            lineHeight: "normal !important",
+          },
+          ".firstDate::-webkit-calendar-picker-indicator": {
+            position: "absolute",
+            right: "0",
+            width: "100%",
+            height: "100%",
+            margin: "0",
+            padding: "0",
+            opacity: "0",
+            cursor: "pointer",
+          },
+        }}
     >
       <Navbar usuario={usuario} menuItems={menuItems} />
       <Box
@@ -36,6 +54,8 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          maxWidth:"1024px",
+          width:"100%",
         }}
       >
         <Typography

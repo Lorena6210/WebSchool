@@ -25,6 +25,38 @@ export default function LoginPage({ usuarios }: LoginPageProps) {
    return <Login usuariosProp={usuarios} />;
 }
 
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { req } = ctx;
+  const cookies = req.cookies;
+  const encrytedSession = cookies.user_session;
+
+  if (encryptedSession) {
+    try {
+      // Descriptografia
+      const CrytoJS = require('cryto-js');
+      //Use variável de ambiente em produção
+      const secretKey = process.env.COOKIE_SECRET || 'sua-chave-secreta'
+      const bytes = CryptoJS.AES.descrypt(encryptedSession, secretKey);
+      const sessionData = JSON.parse(bytes.toString(CryptoJS.enc.utf8));
+
+      return {
+        redirect: {
+          destination: `/${sessionData.type}/${sessionData.id}`
+        }
+      };
+    }catch (error) {
+
+    }
+    return {
+      prop: {
+        usuario: data.usuarios,
+      }
+    }
+  }
+}
+  
+
+
 // export const getServerSideProps: GetServerSideProps = async (ctx) => {
 //   const usuario = await jwtLoginStatus(ctx);
 

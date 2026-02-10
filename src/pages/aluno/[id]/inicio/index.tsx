@@ -1,47 +1,62 @@
-import { mockTurmas } from "@/mock/mockTurmas"; 
-import {data} from "@/mock/mockUsuarios"
-import { getMenuByRole } from "@/components/Sidebar/index"; // Seu menu.ts
-import { useRouter } from "next/router";  // Pages Router
+// /pages/aluno/[id]/index.tsx (or wherever this page is located)
+import { GetServerSideProps } from "next";
+import { TurmaCompleta } from "@/types/Turma";
+import { mockTurmas } from "@/mock/mockTurmas";
+import { data } from "@/mock/mockUsuarios";
+import BasePage from "@/components/BasePage";
+import AlunoInicio from "@/Views/Student/components/inicio";
 
-export default function AlunoInicio() {
-  const router = useRouter();
+interface Usuario {
+  Nome: string;
+  Id: number;
+  Role: string;
+}
 
-  // Correção: Force id a ser uma string (evita [object Object])
-  const id = String(router.query.id);  // Converte para string, mesmo se for array/objeto
+interface Props {
+  usuario: Usuario;
+  turma: TurmaCompleta | null; // Pass only the relevant turma
+}
 
-  // Aguarde o carregamento e valide
-  if (!id || id === 'undefined' || id === '[object Object]') {
-    return <div>Carregando ou ID inválido...</div>;
+export default function PaginaAlunoInicial({ usuario, turma }: Props) {
+  if (!turma) {
+    return <div>Turma não encontrada.</div>; // Fallback if no turma
   }
 
-  const userId = parseInt(id);
-
-  // Filtrar dados do aluno
-  const aluno = data.usuarios.students.find((s) => s.id === userId);
-  const turma = mockTurmas.find((t) => t.Id === aluno?.turmaId);
-
-  if (!aluno || !turma) return <div>Usuário ou turma não encontrada.</div>;
-
-  const menu = getMenuByRole("ALUNO", userId);
-
   return (
-    <div>
-      <h1>Início - Aluno {aluno.nome}</h1>
-      <p>Turma: {turma.Nome}</p>
-      <ul>
-        {turma.disciplinas.map((disc) => (
-          <li key={disc.Id}>
-            {disc.Nome} - Nota: {disc.Nota} - Progresso: {disc.progresso}%
-          </li>
-        ))}
-      </ul>
-      <nav>
-        {menu.map((item, idx) => (
-          <button key={idx} onClick={() => router.push(item.path)}>
-            {item.icon} {item.label}
-          </button>
-        ))}
-      </nav>
-    </div>
+    <BasePage usuario={usuario} titulo={null}>
+      <AlunoInicio usuario={usuario} turma={turma} />
+    </BasePage>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { id } = ctx.query;
+
+  if (!id || Array.isArray(id)) {
+    return { notFound: true };
+  }
+
+  const idAluno = Number(id);
+  if (isNaN(idAluno)) {
+    return { notFound: true };
+  }
+
+  const aluno = data.usuarios.students.find((u) => u.id === idAluno);
+  if (!aluno) {
+    return { notFound: true };
+  }
+
+  // Fetch only the student's turma (assuming aluno.turmaId exists)
+  const turma = mockTurmas.find((t) => t.Id === aluno.turmaId) || null;
+
+  return {
+    props: {
+      usuario: {
+        Id: aluno.id,
+        Nome: aluno.nome,
+        Role: "ALUNO",
+      },
+      turma, // Pass the specific turma or null
+    },
+  };
+};

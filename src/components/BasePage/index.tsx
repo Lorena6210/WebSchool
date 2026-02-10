@@ -16,12 +16,12 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
 
   return (
     <Box
-        width={"97.74%"}
-        minW="100px"
-        marginTop="-8px"
-        marginLeft="-7.8px"
-        fontFamily= "Inter, Arial, sans-serif"
-        background ="linear-gradient(120deg, #0dae6d 0%, #cfdef3 100%)"
+      width={"97.74%"}
+      minW="100px"
+      marginTop="-8px"
+      marginLeft="-7.8px"
+      fontFamily="Inter, Arial, sans-serif"
+      background="linear-gradient(120deg, #0dae6d 0%, #cfdef3 100%)"
     >
       <Navbar usuario={usuario} menuItems={menuItems} />
       <Box
@@ -33,28 +33,31 @@ export default function BasePage({ usuario, titulo, children }: BasePageProps) {
           flexDirection: "column",
           // alignItems: "center",
           // maxWidth:"1024px",
-          width:"100%",
+          width: "100%",
           // height:"90vh",
           background: "linear-gradient(to bottom right, #dbeafe, #fce7f3, #fef3c7)",
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            textAlign: "center",
-            background: "linear-gradient(90deg, #4CAF50 60%, #38b6ff 100%)",
-            color: "white",
-            p: "18px 32px",
-            borderRadius: "16px",
-            mb: "32px",
-            fontWeight: 700,
-            boxShadow: "0 4px 24px rgba(56,182,255,0.10)",
-            
-          }}
-        >
-          {titulo}
-        </Typography>
+        {titulo ? (
+          <Typography
+            variant="h4"
+            sx={{
+              textAlign: "center",
+              background: "linear-gradient(90deg, #4CAF50 60%, #38b6ff 100%)",
+              color: "white",
+              p: "18px 32px",
+              borderRadius: "16px",
+              mb: "32px",
+              fontWeight: 700,
+              boxShadow: "0 4px 24px rgba(56,182,255,0.10)",
 
+            }}
+          >
+            {titulo || null}
+          </Typography>
+        ) : (
+          <></>
+        )}
         {children}
       </Box>
     </Box>

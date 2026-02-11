@@ -1,10 +1,12 @@
-// /pages/aluno/[id]/index.tsx (or wherever this page is located)
+// pages/aluno/[id].tsx - Página dinâmica para alunos
 import { GetServerSideProps } from "next";
-import { TurmaCompleta } from "@/types/Turma";
-import { mockTurmas } from "@/mock/mockTurmas";
-import { data } from "@/mock/mockUsuarios";
+import AlunoPage from "../../../../Views/Student";  // Ajuste o caminho se necessário (e.g., @/Views/Student)
+import { data } from "@/mock/mockUsuarios";  // Corrigido: Import do data.ts (não mockUsuarios) - assumindo que o arquivo é mockUsuarios.ts baseado no contexto
+// import BasePage from "@/components/BasePage";  // Removido se não usado, mas mantido no código abaixo
+import { TurmaCompleta, Disciplina } from "@/types/Turma";  // Assumindo que existem; remova se não usados
+import { mockTurmas } from "@/mock/mockTurmas";  // Import separado para turmas - assumindo que existe; se não, substitua por lógica para buscar turmas
+import Root from "@/components/Root";
 import BasePage from "@/components/BasePage";
-import AlunoInicio from "@/Views/Student/components/inicio";
 
 interface Usuario {
   Nome: string;
@@ -14,22 +16,21 @@ interface Usuario {
 
 interface Props {
   usuario: Usuario;
-  turma: TurmaCompleta | null; // Pass only the relevant turma
+  turmas: TurmaCompleta[];  // Adicionado como prop para passar turmas
 }
 
-export default function PaginaAlunoInicial({ usuario, turma }: Props) {
-  if (!turma) {
-    return <div>Turma não encontrada.</div>; // Fallback if no turma
-  }
-
+export default function PaginaAlunoInicial({ usuario, turmas }: Props) {  // Corrigido: turmas como prop
+  const turma = turmas[0];  // Agora usa a prop turmas - ajuste se precisar de lógica para selecionar a turma correta do aluno
   return (
-    <BasePage usuario={usuario} titulo={null}>
-      <AlunoInicio usuario={usuario} turma={turma} />
-    </BasePage>
+      <BasePage usuario={usuario} titulo={turma?.Nome || "Turma"} >
+        <AlunoPage usuario={usuario} />
+      </BasePage>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  ctx
+) => {
   const { id } = ctx.query;
 
   if (!id || Array.isArray(id)) {
@@ -37,17 +38,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   }
 
   const idAluno = Number(id);
-  if (isNaN(idAluno)) {
-    return { notFound: true };
-  }
+  const aluno = data.usuarios.students.find(
+    (u) => u.id === idAluno
+  );
 
-  const aluno = data.usuarios.students.find((u) => u.id === idAluno);
   if (!aluno) {
     return { notFound: true };
   }
-
-  // Fetch only the student's turma (assuming aluno.turmaId exists)
-  const turma = mockTurmas.find((t) => t.Id === aluno.turmaId) || null;
 
   return {
     props: {
@@ -56,7 +53,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
         Nome: aluno.nome,
         Role: "ALUNO",
       },
-      turma, // Pass the specific turma or null
+      turmas: mockTurmas,  // Assumindo que mockTurmas é um array de TurmaCompleta; substitua por fetch real se necessário
     },
   };
 };

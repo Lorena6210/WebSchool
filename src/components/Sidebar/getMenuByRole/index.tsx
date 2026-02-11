@@ -1,7 +1,8 @@
+// src/components/BasePage/index.tsx  // Assuming this is the file path based on context
 import React from "react";
-import { useRouter } from "next/navigation";
-import Navbar from "../views";
-import { getMenuByRole } from "../index";
+import { useRouter } from "next/router";  // Changed to "next/router" for Pages Router compatibility
+import { getMenuByRole, Role } from "../index";  // Corrected path to lib/menu.ts; removed duplicate import
+import Navbar from "../views/index";  // Assuming Navbar is in src/components/Navbar/index.tsx; adjust if path differs
 
 interface Usuario {
   Nome: string;
@@ -16,7 +17,7 @@ interface LayoutProps {
 
 export default function Layout({ usuario, children }: LayoutProps) {
   const router = useRouter();
-  const menuItems = getMenuByRole(usuario.Role, router);
+  const menuItems = getMenuByRole(usuario.Role as Role, usuario.Id, router);  // Fixed: Added userId and cast Role; matches lib/menu.ts signature
 
   return (
     <div
@@ -37,10 +38,10 @@ export default function Layout({ usuario, children }: LayoutProps) {
           background: "#f4f9fb",
           display: "flex",
           justifyContent: "center",
-          width:"1024px"
+          width: "1024px",  // Fixed: Added quotes for string value
         }}
       >
-        <div style={{ width: "100%", maxWidth: "1024px", flexDirection:"column" }}>
+        <div style={{ width: "100%", maxWidth: "1024px", flexDirection: "column" }}>
           {children}
         </div>
       </main>

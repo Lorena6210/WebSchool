@@ -1,158 +1,175 @@
-// lib/menu.ts - Arquivo corrigido para o utilitário de menu
-import { useRouter } from "next/navigation";  // Import correto para Next.js 13+
+// lib/menu.ts
 import { JSX } from "react";
+import { useRouter } from "next/navigation";
 import {
   FaUserGraduate,
   FaChalkboardTeacher,
   FaUserShield,
-  FaUserTie
+  FaUserTie,
+  FaQuestion,
+  FaCog,
+  FaSignOutAlt,
+  FaHome,
+  FaBook,
+  FaClipboardList,
+  FaChartBar,
+  FaCalendarAlt,
+  FaUser,
+  FaUsers,
 } from "react-icons/fa";
 
-interface MenuItem {
+export interface MenuItem {
   icon: JSX.Element;
   label: string;
   onClick: () => void;
 }
 
-export const getMenuByRole = (role: string | number, id?: number): Menu => {
-  const router = useRouter();  // Corrigido: router é o hook do Next.js, não um parâmetro string[]
+export type Role = "ALUNO" | "PROFESSOR" | "RESPONSAVEL" | "GESTOR";
 
-  const base = {
-    ajuda: {
-      icon: <FaUserShield />,
+export const getMenuByRole = (
+  role: Role,
+  userId: number,
+  router: ReturnType<typeof useRouter>,
+): MenuItem[] => {
+  const base: MenuItem[] = [
+    {
+      icon: <FaQuestion />,
       label: "Ajuda",
-      onClick: () => router.push(`/ajuda`)
+      onClick: () => router.push("/ajuda"),
     },
-    configuracoes: {
-      icon: <FaUserTie />,
+    {
+      icon: <FaCog />,
       label: "Configurações",
-      onClick: () => router.push(`/configuracoes`)
+      onClick: () => router.push("/configuracoes"),
     },
-    sair: {
-      icon: <FaUserGraduate />,
+    {
+      icon: <FaSignOutAlt />,
       label: "Sair",
-      onClick: () => (window.location.href = `/`)  // Ou router.push(``/``) para navegação SPA
-    }
-  };
+      onClick: () => router.push("/"),
+    },
+  ];
 
-  const menus = {
+  const menus: Record<Role, MenuItem[]> = {
     ALUNO: [
       {
-        icon: <FaUserGraduate />,
+        icon: <FaHome />,
         label: "Início",
-        onClick: () => router.push(`/aluno/${id}/inicio`)  // Corrigido: Usa userId passado como parâmetro
+        onClick: () => router.push(`/aluno/${userId}/inicio`),
       },
       {
-        icon: <FaUserGraduate />,
+        icon: <FaBook />,
         label: "Disciplinas",
-        onClick: () => router.push(`/aluno/${id}/disciplinas`)
+        onClick: () => router.push(`/aluno/${userId}/disciplinas`),
       },
       {
-        icon: <FaUserGraduate />,
+        icon: <FaClipboardList />,
         label: "Atividades",
-        onClick: () => router.push(`/aluno/${id}/atividades`)
+        onClick: () => router.push(`/aluno/${userId}/atividades`),
       },
       {
-        icon: <FaUserGraduate />,
+        icon: <FaChartBar />,
         label: "Boletim",
-        onClick: () => router.push(`/aluno/${id}/boletim`)
+        onClick: () => router.push(`/aluno/${userId}/boletim`),
       },
       {
-        icon: <FaUserGraduate />,
+        icon: <FaUser />,
         label: "Perfil",
-        onClick: () => router.push(`/aluno/${id}/perfil`)
+        onClick: () => router.push(`/aluno/${userId}/perfil`),
       },
-      base.ajuda,
-      base.configuracoes,
-      base.sair
+      ...base,
     ],
 
     PROFESSOR: [
       {
-        icon: <FaChalkboardTeacher />,
+        icon: <FaHome />,
         label: "Dashboard",
-        onClick: () => router.push(`/professor`)
+        onClick: () => router.push(`/professor/${userId}`),
       },
       {
-        icon: <FaChalkboardTeacher />,
+        icon: <FaUsers />,
         label: "Turmas",
-        onClick: () => router.push(`/professor/${id}/turmas`)
+        onClick: () => router.push(`/professor/${userId}/turmas`),
       },
       {
-        icon: <FaChalkboardTeacher />,
+        icon: <FaClipboardList />,
         label: "Atividades",
-        onClick: () => router.push(`/professor/${id}/atividades`)
+        onClick: () => router.push(`/professor/${userId}/atividades`),
       },
       {
-        icon: <FaChalkboardTeacher />,
+        icon: <FaUser />,
         label: "Perfil",
-        onClick: () => router.push(`/professor/${id}/perfil`)
+        onClick: () => router.push(`/professor/${userId}/perfil`),
       },
-      base.ajuda,
-      base.configuracoes,
-      base.sair
+      ...base,
     ],
 
     RESPONSAVEL: [
       {
-        icon: <FaUserTie />,
+        icon: <FaHome />,
         label: "Visão Geral",
-        onClick: () => router.push(`/responsavel`)
+        onClick: () => router.push(`/responsavel/${userId}`),
       },
       {
-        icon: <FaUserTie />,
+        icon: <FaUserGraduate />,
         label: "Aluno",
-        onClick: () => router.push(`/responsavel/${id}/aluno`)
+        onClick: () => router.push(`/responsavel/${userId}/aluno`),
       },
       {
-        icon: <FaUserTie />,
+        icon: <FaClipboardList />,
         label: "Atividades",
-        onClick: () => router.push(`/responsavel/${id}/atividades`)
+        onClick: () => router.push(`/responsavel/${userId}/atividades`),
       },
       {
-        icon: <FaUserTie />,
+        icon: <FaCalendarAlt />,
         label: "Calendário",
-        onClick: () => router.push(`/responsavel/${id}/calendario`)
+        onClick: () => router.push(`/responsavel/${userId}/calendario`),
       },
       {
-        icon: <FaUserTie />,
+        icon: <FaUser />,
         label: "Perfil",
-        onClick: () => router.push(`/responsavel/${id}/perfil`)
+        onClick: () => router.push(`/responsavel/${userId}/perfil`),
       },
-      base.ajuda,
-      base.configuracoes,
-      base.sair
+      ...base,
     ],
 
     GESTOR: [
       {
-        icon: <FaUserShield />,
+        icon: <FaHome />,
         label: "Dashboard",
-        onClick: () => router.push(`/gestor`)
+        onClick: () => router.push(`/gestor/${userId}`),
       },
       {
-        icon: <FaUserShield />,
+        icon: <FaUsers />,
         label: "Usuários",
-        onClick: () => router.push(`/gestor/${id}/usuarios`)
+        onClick: () => router.push(`/gestor/${userId}/usuarios`),
       },
       {
-        icon: <FaUserShield />,
+        icon: <FaUsers />,
         label: "Turmas",
-        onClick: () => router.push(`/gestor/${id}/turmas`)
+        onClick: () => router.push(`/gestor/${userId}/turmas`),
       },
       {
-        icon: <FaUserShield />,
+        icon: <FaChartBar />,
         label: "Relatórios",
-        onClick: () => router.push(`/gestor/${id}/relatorios`)
+        onClick: () => router.push(`/gestor/${userId}/relatorios`),
       },
       {
-        icon: <FaUserShield />,
+        icon: <FaCog />,
         label: "Configurações",
-        onClick: () => router.push(`/gestor/${id}/configuracoes`)
+        onClick: () => router.push(`/gestor/${userId}/configuracoes`),
       },
-      base.sair
-    ]
+      {
+        icon: <FaQuestion />,
+        label: "Ajuda",
+        onClick: () => router.push("/ajuda"),
+      },
+      {
+        icon: <FaSignOutAlt />,
+        label: "Sair",
+        onClick: () => router.push("/"),
+      },
+    ],
   };
 
-  return menus[role] || [];
+  return menus[role];
 };

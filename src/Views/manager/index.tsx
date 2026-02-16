@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Card, Typography, Grid, List, ListItem, ListItemText } from "@mui/material";
 import { FaUserTie } from "react-icons/fa";
-import { data } from "@/mock/mockUsuarios";  // Para acessar logs ou controle
+import { data } from "@/mock/schoolMock";  // Para acessar logs ou controle
 
 interface Usuario {
   Nome: string;

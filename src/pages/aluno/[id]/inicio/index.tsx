@@ -1,7 +1,7 @@
 // pages/aluno/[id].tsx - Página dinâmica para alunos
 import { GetServerSideProps } from "next";
 import AlunoPage from "../../../../Views/Student";  // Ajuste o caminho se necessário (e.g., @/Views/Student)
-import { data } from "@/mock/mockUsuarios";  // Corrigido: Import do data.ts (não mockUsuarios) - assumindo que o arquivo é mockUsuarios.ts baseado no contexto
+import { data } from "@/mock/schoolMock";  // Corrigido: Import do data.ts (não mockUsuarios) - assumindo que o arquivo é mockUsuarios.ts baseado no contexto
 // import BasePage from "@/components/BasePage";  // Removido se não usado, mas mantido no código abaixo
 import { TurmaCompleta, Disciplina } from "@/types/Turma";  // Assumindo que existem; remova se não usados
 import { mockTurmas } from "@/mock/mockTurmas";  // Import separado para turmas - assumindo que existe; se não, substitua por lógica para buscar turmas

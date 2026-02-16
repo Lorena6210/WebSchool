@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import { data } from "@/mock/mockUsuarios";
+import { data } from "@/mock/schoolMock";
 import { TurmaCompleta } from "@/types/Turma";
 import { mockTurmas } from "@/mock/mockTurmas";
 import BasePage from "@/components/BasePage";

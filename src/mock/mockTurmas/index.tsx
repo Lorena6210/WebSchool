@@ -6,6 +6,7 @@ export const mockTurmas: TurmaCompleta[] = [
   {
     Id: 1,
     Nome: "Turma A - Matemática",
+    professorId: 1,
     disciplinas: [
       {
         Id: 1,
@@ -13,11 +14,19 @@ export const mockTurmas: TurmaCompleta[] = [
         Nota: "8.5",
         progresso: 75,
         frequencia: 90,
-        descricao: "Estudo de equações, funções e estruturas algébricas básicas.",
-        topicos: ["Equações lineares", "Funções quadráticas", "Sistemas de equações"],
+        descricao:
+          "Estudo de equações, funções e estruturas algébricas básicas.",
+        topicos: [
+          "Equações lineares",
+          "Funções quadráticas",
+          "Sistemas de equações",
+        ],
         materiais: [
           { nome: "Vídeo introdutório", url: "https://exemplo.com/video" },
-          { nome: "Exercícios práticos", url: "https://exemplo.com/exercicios" },
+          {
+            nome: "Exercícios práticos",
+            url: "https://exemplo.com/exercicios",
+          },
         ],
         atividades: [
           { nome: "Atividade 1 - Equações", nota: 8.0 },
@@ -140,7 +149,12 @@ export const mockData = {
         perfilId: 3,
         tipo: "Mae",
         alunos: [1],
-        permissoes: ["VER_NOTAS", "VER_ATIVIDADES", "VER_CALENDARIO", "VER_VIDEOAULAS"],
+        permissoes: [
+          "VER_NOTAS",
+          "VER_ATIVIDADES",
+          "VER_CALENDARIO",
+          "VER_VIDEOAULAS",
+        ],
       },
     ],
     teachers: [

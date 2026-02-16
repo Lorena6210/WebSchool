@@ -1,13 +1,11 @@
-// pages/responsavel/[id].tsx - Página dinâmica para responsáveis
 import { GetServerSideProps } from "next";
-import ResponsiblePage from "../../Views/responsible";
-import { data } from "@/mock/mockUsuarios";
 import BasePage from "@/components/BasePage";
-import Root from '../../components/Root';
+import ResponsiblePage from "@/Views/responsible";
+import { schoolMock } from "@/mock/schoolMock";
 
 interface Usuario {
-  Nome: string;
   Id: number;
+  Nome: string;
   Role: string;
 }
 
@@ -17,22 +15,38 @@ interface Props {
 
 export default function PaginaResponsavel({ usuario }: Props) {
   return (
-    <BasePage usuario={usuario} titulo="Dados do Responsável">
+    <BasePage usuario={usuario} titulo="Painel do Responsável">
       <ResponsiblePage usuario={usuario} />
     </BasePage>
-
   );
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const { id } = context.query;
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { id } = ctx.query;
+
   if (!id || Array.isArray(id)) return { notFound: true };
+
   const idResponsavel = Number(id);
-  const responsavel = data.usuarios.responsible.find((u) => u.id === idResponsavel);
+
+  const responsavel = schoolMock.responsaveis.find(
+    r => r.id === idResponsavel
+  );
+
   if (!responsavel) return { notFound: true };
+
+  const perfil = schoolMock.perfis.find(
+    p => p.id === responsavel.perfilId
+  );
+
+  if (!perfil) return { notFound: true };
+
   return {
     props: {
-      usuario: { Id: responsavel.id, Nome: responsavel.nome, Role: "RESPONSAVEL" },
+      usuario: {
+        Id: responsavel.id,
+        Nome: perfil.nome,
+        Role: "RESPONSAVEL",
+      },
     },
   };
 };

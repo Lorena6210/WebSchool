@@ -1,13 +1,11 @@
-// pages/gestor/[id].tsx - Página dinâmica para gestores
 import { GetServerSideProps } from "next";
-import ManagerPage from "../../Views/manager";
-import { data } from "@/mock/mockUsuarios";
 import BasePage from "@/components/BasePage";
-import Root from '../../components/Root';
+import ManagerPage from "@/Views/manager";
+import { schoolMock } from "@/mock/schoolMock";
 
 interface Usuario {
-  Nome: string;
   Id: number;
+  Nome: string;
   Role: string;
 }
 
@@ -23,15 +21,26 @@ export default function PaginaGestor({ usuario }: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const { id } = context.query;
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { id } = ctx.query;
+
   if (!id || Array.isArray(id)) return { notFound: true };
+
   const idGestor = Number(id);
-  const gestor = data.usuarios.manager.find((u) => u.id === idGestor);
-  if (!gestor) return { notFound: true };
+
+  const perfil = schoolMock.perfis.find(
+    p => p.id === idGestor && p.role === "GESTOR"
+  );
+
+  if (!perfil) return { notFound: true };
+
   return {
     props: {
-      usuario: { Id: gestor.id, Nome: gestor.nome, Role: "GESTOR" },
+      usuario: {
+        Id: perfil.id,
+        Nome: perfil.nome,
+        Role: "GESTOR",
+      },
     },
   };
 };

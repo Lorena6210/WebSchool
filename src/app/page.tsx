@@ -2,7 +2,7 @@
 "use client";
 import LoginPage from "@/pages/login";
 import { useEffect, useState } from "react";
-import { data } from "@/mock/mockUsuarios";
+import { data } from "@/mock/schoolMock";
 
 // Transformar o JSON em Dados (usando nome diretamente dos usuários, e outros do perfil)
 const mockUsuarios = {

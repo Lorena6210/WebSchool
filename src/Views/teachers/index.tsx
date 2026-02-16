@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Card, Typography, Grid, List, ListItem, ListItemText } from "@mui/material";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { TurmaCompleta } from "@/types/Turma";
-import { data } from "@/mock/mockUsuarios";
+import { data } from "@/mock/schoolMock";
 import { mockTurmas } from "@/mock/mockTurmas";
 
 interface Usuario {

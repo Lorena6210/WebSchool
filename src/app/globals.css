@@ -1,26 +1,148 @@
 @import "tailwindcss";
 
+/* ============================================================
+   WebSchool — Estilos Globais
+   Design: Academic Warmth (Neobrutalism Educacional Suave)
+   ============================================================ */
+
+/* Variáveis CSS */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+
+  /* Paleta Academic Warmth */
+  --color-bg: #fdfaf5;
+  --color-surface: #ffffff;
+  --color-ink: #1c1917;
+  --color-ink-muted: rgba(28, 25, 23, 0.6);
+  --color-ink-subtle: rgba(28, 25, 23, 0.3);
+  --color-border: #1c1917;
+  --color-border-subtle: rgba(28, 25, 23, 0.15);
+
+  /* Cores de perfil */
+  --color-aluno: #6b21a8;
+  --color-responsavel: #b45309;
+  --color-professor: #166534;
+  --color-gestor: #3b4fd8;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Reset e base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografia */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(28, 25, 23, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(28, 25, 23, 0.4);
+}
+
+/* Focus acessível */
+:focus-visible {
+  outline: 2px solid var(--color-gestor);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Seleção de texto */
+::selection {
+  background-color: rgba(59, 79, 216, 0.2);
+  color: var(--color-ink);
+}
+
+/* Utilitários de fonte */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Neobrutalism helpers */
+.neo-shadow {
+  box-shadow: 4px 4px 0px #1c1917;
+}
+
+.neo-shadow-sm {
+  box-shadow: 3px 3px 0px #1c1917;
+}
+
+.neo-shadow-lg {
+  box-shadow: 6px 6px 0px #1c1917;
 }

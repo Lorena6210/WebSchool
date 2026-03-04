@@ -407,3 +407,89 @@ export const mockClassSchedule: ClassSchedule = {
     },
   ],
 };
+
+// ============================================================
+// Camada de Serviço Mock (Simulação de API)
+// ============================================================
+
+/**
+ * Simula um atraso de rede para dar mais realismo à interface (loading states)
+ */
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const MockAPI = {
+  auth: {
+    login: async (identifier: string, password: string) => {
+      await delay(800); // Simula delay de rede
+      const cred = loginCredentials.find(
+        (c) => c.identifier === identifier && c.password === password
+      );
+
+      if (!cred) {
+        throw new Error("Credenciais inválidas");
+      }
+
+      const user = mockUsers.find((u) => u.id === cred.userId);
+      return user || null;
+    },
+    logout: async () => {
+      await delay(500);
+      return true;
+    },
+  },
+
+  users: {
+    getById: async (id: string) => {
+      await delay(400);
+      return mockUsers.find((u) => u.id === id) || null;
+    },
+    getAll: async () => {
+      await delay(600);
+      return mockUsers;
+    },
+  },
+
+  calendar: {
+    getEvents: async () => {
+      await delay(500);
+      return mockCalendarEvents;
+    },
+  },
+
+  academic: {
+    getActivities: async () => {
+      await delay(600);
+      return mockActivities;
+    },
+    getExams: async () => {
+      await delay(500);
+      return mockExams;
+    },
+    getGrades: async () => {
+      await delay(700);
+      return mockGrades;
+    },
+    getSchoolHistory: async () => {
+      await delay(800);
+      return mockSchoolHistory;
+    },
+    getSchedule: async () => {
+      await delay(400);
+      return mockClassSchedule;
+    },
+  },
+
+  medical: {
+    getRecord: async () => {
+      await delay(500);
+      return mockMedicalRecord;
+    },
+  },
+
+  notices: {
+    getAll: async () => {
+      await delay(400);
+      return mockNotices;
+    },
+  },
+};

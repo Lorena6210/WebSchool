@@ -23,17 +23,17 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
-
-const ACCENT = '#6B21A8';
 
 export default function SidebarAluno() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   return (
     <Box
       sx={{
-        width: 260,
+        width: '280px',
         height: '100vh',
         background: 'linear-gradient(180deg, #1C1917 0%, #141210 100%)',
         color: '#F3EFEA',
@@ -45,38 +45,13 @@ export default function SidebarAluno() {
     >
       {/* TOPO */}
       <Box>
-        {/* Logo */}
-        <Box display="flex" alignItems="center" mb={4}>
-          <Avatar
-            sx={{
-              bgcolor: ACCENT,
-              width: 42,
-              height: 42,
-              fontWeight: 'bold',
-              mr: 2,
-            }}
-          >
-            CW
-          </Avatar>
-          <Box>
-            <Typography fontWeight="bold">
-              Creamywork
-            </Typography>
-            <Typography variant="caption" sx={{ opacity: 0.6 }}>
-              Neck
-            </Typography>
-          </Box>
-        </Box>
-
-        <Divider sx={{ borderColor: '#ffffff20', mb: 3 }} />
-
         {/* Usuário */}
         <Box display="flex" alignItems="center" mb={3}>
           <Avatar
             sx={{
               bgcolor: '#9333EA',
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               mr: 2,
             }}
           >
@@ -106,58 +81,73 @@ export default function SidebarAluno() {
         </Box>
 
         {/* MENU */}
-        <List>
+        <List sx={{ py: 0 }}>
           <ListItemButton
-            sx={{
-              backgroundColor: '#2A2725',
-              borderRadius: 2,
-              mb: 1,
-            }}
+            onClick={() => router.push('/mural/alun')}
+            sx={itemStyle}
           >
             <ListItemIcon sx={{ color: '#fff' }}>
-              <MenuBookIcon />
+              <MenuBookIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Mural" />
           </ListItemButton>
 
-          <ListItemButton sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => router.push('/atividades')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <AssignmentIcon />
+              <AssignmentIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Atividades" />
           </ListItemButton>
 
-          <ListItemButton sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => router.push('/provas/aluno')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <DescriptionIcon />
+              <DescriptionIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Provas" />
           </ListItemButton>
 
-          <ListItemButton sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => router.push('/boletim/aluno')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <BarChartIcon />
+              <BarChartIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Boletim" />
           </ListItemButton>
 
-          <ListItemButton sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => router.push('/historico-medico')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <FavoriteBorderIcon />
+              <FavoriteBorderIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Histórico Médico" />
           </ListItemButton>
 
-          <ListItemButton sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => router.push('/historico-escola')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <SchoolIcon />
+              <SchoolIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Histórico Escolar" />
           </ListItemButton>
 
-          <ListItemButton>
+          <ListItemButton
+            onClick={() => router.push('/calendario/aluno')}
+            sx={itemStyle}
+          >
             <ListItemIcon sx={{ color: '#aaa' }}>
-              <CalendarTodayIcon />
+              <CalendarTodayIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Calendário" />
           </ListItemButton>
@@ -168,14 +158,23 @@ export default function SidebarAluno() {
       <Box>
         <Divider sx={{ borderColor: '#ffffff20', mb: 2 }} />
 
-        <ListItemButton sx={{ mb: 1 }}>
+        <ListItemButton
+          onClick={() => router.push('/perfil')}
+          sx={itemStyle}
+        >
           <ListItemIcon sx={{ color: '#aaa' }}>
-            <PersonOutlineIcon />
+            <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Perfil" />
         </ListItemButton>
 
-        <ListItemButton onClick={logout}>
+        <ListItemButton
+          onClick={() => {
+            logout();
+            router.push('/login');
+          }}
+          sx={itemStyle}
+        >
           <ListItemIcon sx={{ color: '#EF4444' }}>
             <LogoutIcon />
           </ListItemIcon>
@@ -188,3 +187,15 @@ export default function SidebarAluno() {
     </Box>
   );
 }
+
+/* Estilo padrão dos itens */
+const itemStyle = {
+  minHeight: 40,
+  px: 1.5,
+  py: 0.5,
+  mb: 0.5,
+  borderRadius: 2,
+  '& .MuiListItemIcon-root': {
+    minWidth: 32,
+  },
+};

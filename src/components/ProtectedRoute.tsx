@@ -37,7 +37,7 @@ export default function ProtectedRoute({
     }
   }, [mounted, isLoading, isAuthenticated, user, allowedRoles, router]);
 
-  // ⛔️ Evita mismatch SSR
+  //  Evita mismatch SSR
   if (!mounted) return null;
 
   if (isLoading) return null;

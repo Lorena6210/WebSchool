@@ -9,7 +9,7 @@ import Avisos from "@/pages/responsavel/Avisos";
 
 export default function AvisosPage() {
   return (
-    <ProtectedRoute allowedRoles={["responsavel"]}>
+    <ProtectedRoute allowedRoles={["responsavel", "professor", "gestor"]}>
       <Avisos />
     </ProtectedRoute>
   );

@@ -19,13 +19,13 @@ export function StatCard({ title, value, subtitle, icon, accentColor = "#3B4FD8"
   return (
     <div
       className={cn(
-        "bg-white border-2 border-[#1C1917] rounded-xl p-5 relative overflow-hidden",
+        "bg-white border border-[#1C1917]/10 rounded-2xl p-5 relative overflow-hidden",
         className
       )}
-      style={{ boxShadow: "4px 4px 0px #1C1917" }}
+      style={{ boxShadow: "0 6px 22px rgba(28, 25, 23, 0.08)" }}
     >
       <div
-        className="absolute top-0 left-0 w-1.5 h-full rounded-l-xl"
+        className="absolute top-0 left-0 w-1.5 h-full rounded-l-2xl"
         style={{ backgroundColor: accentColor }}
       />
       <div className="pl-2">
@@ -58,11 +58,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, accentColor = "#1C1917", action }: PageHeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-8">
+    <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
       <div>
         <h1
           className="text-3xl font-bold text-[#1C1917] mb-1"
-          style={{ fontFamily: "'Fraunces', serif" }}
+          style={{ fontFamily: "'Poppins', sans-serif" }}
         >
           {title}
         </h1>
@@ -88,11 +88,11 @@ interface SectionCardProps {
 export function SectionCard({ title, children, className, noPadding, action }: SectionCardProps) {
   return (
     <div
-      className={cn("bg-white border-2 border-[#1C1917] rounded-xl overflow-hidden", className)}
-      style={{ boxShadow: "4px 4px 0px #1C1917" }}
+      className={cn("overflow-hidden rounded-2xl border border-[#1C1917]/10 bg-white", className)}
+      style={{ boxShadow: "0 8px 24px rgba(28, 25, 23, 0.07)" }}
     >
       {(title || action) && (
-        <div className="px-5 py-4 border-b-2 border-[#1C1917] flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-[#1C1917]/10 px-5 py-4">
           {title && (
             <h3 className="font-bold text-[#1C1917] text-sm uppercase tracking-wider">{title}</h3>
           )}

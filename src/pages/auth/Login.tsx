@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box, Button, Divider, Grid, IconButton,
@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import SchoolIcon from '@mui/icons-material/School';
+import { useAuth } from '@/lib/context/AuthContext';
 
 const demoAccounts = [
   { role: "Aluno", identifier: "2024001", password: "aluno123", color: "#6B21A8", acesso:"aluno" },
@@ -19,6 +20,7 @@ const demoAccounts = [
 
 export default function Login() {
   const router = useRouter();
+  const { login } = useAuth();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -34,21 +36,16 @@ export default function Login() {
 
     setIsLoading(true);
 
-    // Simulação de autenticação
-    const account = demoAccounts.find(
-      acc => acc.identifier === identifier.trim() && acc.password === password
-    );
+    const result = await login(identifier.trim(), password);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    setIsLoading(false);
 
-      if (account) {
-        router.push(`/mural/${account.acesso}`);
-        console.log(account.acesso)
-      } else {
-        alert("Credenciais inválidas.");
-      }
-    }, 800);
+    if (!result.success) {
+      alert(result.error || 'Credenciais inválidas.');
+      return;
+    }
+
+    router.push('/mural');
   };
 
   const fillDemo = (acc: (typeof demoAccounts)[0]) => {
@@ -241,9 +238,9 @@ export default function Login() {
 
         <Divider sx={{ my: 3 }}>Contas de demonstração</Divider>
 
-        <Grid container spacing={1.5} mb={1}>
+        <Grid container spacing={1}mb={1}>
           {demoAccounts.map(acc => (
-            <Grid item xs={6} key={acc.role}>
+            <Grid item xs={6} key={acc.role} width={"48%"}>
               <Button
                 onClick={() => fillDemo(acc)}
                 startIcon={

@@ -1,107 +1,454 @@
-"use client";
-
-// ============================================================
-// WebSchool — Avisos e Comunicados
-// ============================================================
+﻿"use client";
 
 import React, { useState } from "react";
+import {
+  Avatar,
+  Box,
+  Chip,
+  Container,
+  Divider,
+  Paper,
+  ThemeProvider,
+  Typography,
+  createTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import {
+  NotificationsNoneOutlined,
+} from "@mui/icons-material";
 import DashboardLayout from "@/components/DashboardLayout";
-import { PageHeader, SectionCard, Badge } from "@/components/ui/stat-card";
 import { useAuth } from "@/lib/context/AuthContext";
-import { mockNotices } from "@/lib/mockData";
+import { mockNotices, mockClassStudents } from "@/lib/mockData";
 import type { UserRole } from "@/types";
-import { Bell, Plus, Send } from "lucide-react";
 import { toast } from "sonner";
 
-const ACCENT = "#3B4FD8";
+const ACCENT = "#B45309";
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "Poppins, sans-serif",
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          border: "1px solid rgba(0,0,0,0.03)",
+        },
+      },
+    },
+  },
+});
 
 const noticeTypeColors: Record<string, string> = {
-  prova: "#B45309",
-  reuniao: "#3B4FD8",
-  atividade: "#166534",
+  prova: "#FEF9C3",
+  reuniao: "#E0E7FF",
+  atividade: "#D1FAE5",
+  geral: "#F3E5F5",
+};
+
+const noticeTypeColorsText: Record<string, string> = {
+  prova: "#92400E",
+  reuniao: "#4338CA",
+  atividade: "#065F46",
   geral: "#6B21A8",
 };
 
-export default function Avisos() {
-  const { user } = useAuth();
-  const canSend = user?.role === "professor" || user?.role === "gestor";
+const noticeTypeLabels: Record<string, string> = {
+  prova: "Prova",
+  reuniao: "Reunião",
+  atividade: "Atividade",
+  geral: "Geral",
+};
 
-  // Filtrar avisos relevantes para o perfil
-  const myNotices = mockNotices.filter((n) =>
-    n.destinatarios.includes(user?.role as UserRole)
-  );
+type FilterTipo = "todos" | "prova" | "reuniao" | "atividade" | "geral";
 
-  const displayNotices = canSend ? mockNotices : myNotices;
+// Modal de novo comunicado (professor / gestor)
+function ModalNovoComunicado({
+  role,
+  onClose,
+}: {
+  role: UserRole;
+  onClose: () => void;
+}) {
+  const isGestor = role === "gestor";
+  const [form, setForm] = useState({
+    titulo: "",
+    mensagem: "",
+    tipo: "geral",
+    alunoFalta: "",
+  });
+
+  const tiposDisponiveis = isGestor
+    ? ["geral", "prova", "reuniao", "atividade"]
+    : ["geral", "atividade"];
+
+  const handleSubmit = () => {
+    if (!form.titulo || !form.mensagem) {
+      toast.error("Preencha título e mensagem.");
+      return;
+    }
+    toast.success(
+      form.alunoFalta
+        ? `Aviso de falta enviado para responsável e gestor!`
+        : "Comunicado enviado com sucesso!"
+    );
+    onClose();
+  };
 
   return (
-    <DashboardLayout>
-      <PageHeader
-        title={canSend ? "Avisos e Comunicados" : "Avisos"}
-        subtitle={canSend ? "Envie comunicados para alunos e responsáveis" : "Comunicados da escola"}
-        accentColor={ACCENT}
-        action={
-          canSend ? (
-            <button
-              onClick={() => toast.info("Formulário de envio de aviso disponível em breve.")}
-              className="flex items-center gap-2 px-4 py-2 bg-[#3B4FD8] text-white font-semibold rounded-lg border-2 border-[#1C1917] text-sm hover:bg-[#2D3FB8] transition-all active:translate-y-0.5"
-              style={{ boxShadow: "3px 3px 0px #1C1917" }}
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700, color: "#1A1A1A" }}>
+        {isGestor ? "Novo Comunicado" : "Novo Comunicado / Aviso"}
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {!isGestor && (
+            <Box
+              sx={{
+                p: 1.5,
+                bgcolor: "#FEF3C7",
+                border: "1px solid #FDE68A",
+                borderRadius: 1.5,
+                fontSize: "0.875rem",
+                color: "#92400E",
+              }}
             >
-              <Send size={16} />
-              Enviar Aviso
-            </button>
-          ) : undefined
-        }
-      />
+              ⚠️ Professores podem comunicar e avisar, mas não agendar reuniões.
+            </Box>
+          )}
 
-      <div className="space-y-4">
-        {displayNotices.length === 0 ? (
-          <div className="text-center py-16">
-            <Bell size={48} className="text-[#1C1917]/20 mx-auto mb-4" />
-            <p className="text-[#1C1917]/40 font-medium">Nenhum aviso disponível</p>
-          </div>
-        ) : (
-          displayNotices.map((notice) => (
-            <div
-              key={notice.id}
-              className="bg-white border-2 border-[#1C1917] rounded-xl p-5"
-              style={{ boxShadow: "4px 4px 0px #1C1917" }}
+          <FormControl fullWidth size="small">
+            <InputLabel>Tipo</InputLabel>
+            <Select
+              value={form.tipo}
+              onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+              label="Tipo"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge color={noticeTypeColors[notice.tipo]}>
-                      {notice.tipo}
-                    </Badge>
-                    <span className="text-xs text-[#1C1917]/40">
-                      {new Date(notice.data).toLocaleDateString("pt-BR")}
-                    </span>
-                  </div>
-                  <h3
-                    className="font-bold text-[#1C1917] text-lg mb-2"
-                    style={{ fontFamily: "'Fraunces', serif" }}
-                  >
-                    {notice.titulo}
-                  </h3>
-                  <p className="text-sm text-[#1C1917]/70 leading-relaxed">{notice.mensagem}</p>
-                  <div className="flex items-center gap-3 mt-3">
-                    <p className="text-xs text-[#1C1917]/40">Por: {notice.autorNome}</p>
-                    {canSend && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-[#1C1917]/30">Para:</span>
-                        {notice.destinatarios.map((dest) => (
-                          <Badge key={dest} color="#1C1917" className="text-[10px]">
-                            {dest}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
+              {tiposDisponiveis.map((t) => (
+                <MenuItem key={t} value={t}>
+                  {noticeTypeLabels[t]}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            label="Título"
+            value={form.titulo}
+            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+            fullWidth
+            size="small"
+          />
+
+          <TextField
+            label="Mensagem"
+            value={form.mensagem}
+            onChange={(e) => setForm({ ...form, mensagem: e.target.value })}
+            fullWidth
+            multiline
+            rows={3}
+            size="small"
+          />
+
+          {!isGestor && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Aluno (opcional)</InputLabel>
+              <Select
+                value={form.alunoFalta}
+                onChange={(e) => setForm({ ...form, alunoFalta: e.target.value })}
+                label="Aluno (opcional)"
+              >
+                <MenuItem value="">— Sem aluno específico —</MenuItem>
+                {mockClassStudents.map((s) => (
+                  <MenuItem key={s.id} value={s.id}>
+                    {s.nome}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 2, gap: 1 }}>
+        <Box
+          onClick={onClose}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            border: "1px solid #E5E7EB",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { bgcolor: "#F9F9F9" },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Cancelar
+          </Typography>
+        </Box>
+        <Box
+          onClick={handleSubmit}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            bgcolor: ACCENT,
+            color: "white",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { opacity: 0.9 },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Enviar
+          </Typography>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// Componente principal
+export default function Avisos() {
+  const { user } = useAuth();
+  const role = user?.role as UserRole;
+
+  const canSend = role === "professor" || role === "gestor";
+  const [modalOpen, setModalOpen] = useState(false);
+  const [filterTipo, setFilterTipo] = useState<FilterTipo>("todos");
+
+  // Filtra avisos pelo destinatário do perfil atual
+  const baseNotices = mockNotices.filter(
+    (n) => n.destinatarios.includes(role) || canSend
+  );
+
+  const displayNotices =
+    filterTipo === "todos"
+      ? baseNotices
+      : baseNotices.filter((n) => n.tipo === filterTipo);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <DashboardLayout>
+        {modalOpen && canSend && (
+          <ModalNovoComunicado
+            role={role}
+            onClose={() => setModalOpen(false)}
+          />
         )}
-      </div>
-    </DashboardLayout>
+
+        <Box sx={{ width: "100%", fontFamily: "Poppins, sans-serif" }}>
+          <Container maxWidth="lg">
+            {/* HEADER */}
+            <Box sx={{ mb: 5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+                <Avatar sx={{ bgcolor: ACCENT, width: 48, height: 48 }}>
+                  <NotificationsNoneOutlined sx={{ color: "white" }} />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" fontWeight="bold" color="#1A1A1A">
+                    Avisos e Comunicados
+                  </Typography>
+                  <Typography variant="body1" color="#666">
+                    {role === "responsavel"
+                      ? "Comunicados da escola sobre seu filho(a)"
+                      : role === "professor"
+                      ? "Envie comunicados e avisos de falta"
+                      : "Gerencie todos os comunicados da escola"}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider
+                sx={{
+                  borderColor: ACCENT,
+                  width: "100px",
+                  mt: 2,
+                  borderBottomWidth: "2px",
+                }}
+              />
+            </Box>
+
+            {/* AVISOS SECTION */}
+            <Paper sx={{ p: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    letterSpacing: "0.05em",
+                    fontSize: "1.1rem",
+                    color: ACCENT,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <NotificationsNoneOutlined sx={{ fontSize: 20 }} />
+                  Avisos Importantes
+                </Typography>
+                {canSend && (
+                  <Box
+                    onClick={() => setModalOpen(true)}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      bgcolor: ACCENT,
+                      color: "white",
+                      borderRadius: 1.5,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      "&:hover": { opacity: 0.9 },
+                    }}
+                  >
+                    Novo Comunicado
+                  </Box>
+                )}
+              </Box>
+
+              {/* Filtro */}
+              <Box sx={{ display: "flex", gap: 1, mb: 3, flexWrap: "wrap" }}>
+                {(["todos", "prova", "reuniao", "atividade", "geral"] as FilterTipo[]).map(
+                  (t) => (
+                    <Chip
+                      key={t}
+                      label={t === "todos" ? "Todos" : noticeTypeLabels[t]}
+                      onClick={() => setFilterTipo(t)}
+                      variant={filterTipo === t ? "filled" : "outlined"}
+                      sx={{
+                        bgcolor:
+                          filterTipo === t ? ACCENT : "transparent",
+                        color: filterTipo === t ? "white" : "#666",
+                        borderColor:
+                          filterTipo === t ? ACCENT : "#E5E7EB",
+                        fontWeight: 600,
+                      }}
+                    />
+                  )
+                )}
+              </Box>
+
+              {/* Lista de avisos */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {displayNotices.length === 0 ? (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <NotificationsNoneOutlined
+                      sx={{
+                        fontSize: 48,
+                        color: "#D1D5DB",
+                        mb: 1,
+                      }}
+                    />
+                    <Typography color="#999">
+                      Nenhum aviso encontrado
+                    </Typography>
+                  </Box>
+                ) : (
+                  displayNotices.map((notice) => (
+                    <Box
+                      key={notice.id}
+                      sx={{
+                        p: 2,
+                        bgcolor: noticeTypeColors[notice.tipo],
+                        borderRadius: 2,
+                        border: `1px solid ${noticeTypeColorsText[notice.tipo]}20`,
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        "&:hover": {
+                          borderColor: noticeTypeColorsText[notice.tipo],
+                        },
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        mb={1}
+                      >
+                        <Typography
+                          variant="caption"
+                          fontWeight="bold"
+                          color={noticeTypeColorsText[notice.tipo]}
+                          textTransform="uppercase"
+                          fontSize="0.75rem"
+                        >
+                          {noticeTypeLabels[notice.tipo]}
+                        </Typography>
+                        <Typography variant="caption" color="#999">
+                          {new Date(notice.data).toLocaleDateString(
+                            "pt-BR"
+                          )}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        mb={0.5}
+                        color="#1A1A1A"
+                      >
+                        {notice.titulo}
+                      </Typography>
+                      {notice.mensagem && (
+                        <Typography
+                          variant="body2"
+                          color="#555"
+                          sx={{
+                            fontSize: "0.9rem",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {notice.mensagem}
+                        </Typography>
+                      )}
+                      <Box
+                        sx={{
+                          mt: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          fontSize: "0.75rem",
+                          color: "#666",
+                        }}
+                      >
+                        <span>Por: {notice.autorNome}</span>
+                        {canSend && (
+                          <>
+                            <span>•</span>
+                            <span>
+                              Para:{" "}
+                              {notice.destinatarios.join(", ")}
+                            </span>
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+                  ))
+                )}
+              </Box>
+            </Paper>
+          </Container>
+        </Box>
+      </DashboardLayout>
+    </ThemeProvider>
   );
 }

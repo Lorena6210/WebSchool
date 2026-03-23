@@ -5,12 +5,12 @@
 // ============================================================
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import BoletimResponsavel from "@/pages/responsavel/BoletimResponsavel";
+import BoletimRoot from "./index";
 
-export default function BoletimResponsavelPage() {
+export default function BoletimPage() {
   return (
-    <ProtectedRoute allowedRoles={["responsavel"]}>
-      <BoletimResponsavel />
+    <ProtectedRoute allowedRoles={["aluno", "responsavel", "professor"]}>
+      <BoletimRoot />
     </ProtectedRoute>
   );
 }

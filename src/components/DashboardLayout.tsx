@@ -9,15 +9,12 @@ import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
 import {
-  AppBar,
-  Toolbar,
   Drawer,
   Box,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
   Avatar,
   Typography,
   IconButton,
@@ -32,6 +29,7 @@ import {
   Heart,
   Bell,
   FileText,
+  UserRound,
   Users,
   ClipboardList,
   BarChart3,
@@ -40,34 +38,60 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
+import { USER_ROLE_LABELS } from "@/types";
 import type { UserRole } from "@/types";
 
+type MenuItem = { href: string; label: string; icon: React.ReactNode };
+
+type DrawerContentProps = {
+  items: { href: string; label: string; icon: React.ReactNode }[];
+  accentColor: string;
+  pathname: string;
+  user: {
+    nome: string;
+    role: UserRole;
+  };
+  onLogout: () => void;
+  onNavClick: (href: string) => void;
+};
+
 // ---- Definição dos itens de menu por perfil ----
-const menuItems: Record<UserRole, { href: string; label: string; icon: React.ReactNode }[]> = {
+const menuItems: Record<UserRole, MenuItem[]> = {
   aluno: [
-    { href: "/mural/aluno", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    { href: "/mural", label: "Mural", icon: <LayoutDashboard size={18} /> },
     { href: "/atividades", label: "Atividades", icon: <BookOpen size={18} /> },
-    { href: "/calendario", label: "Calendário", icon: <Calendar size={18} /> },
+    { href: "/provas", label: "Provas", icon: <FileText size={18} /> },
+    { href: "/boletim", label: "Boletim", icon: <ClipboardList size={18} /> },
     { href: "/historico-medico", label: "Histórico Médico", icon: <Heart size={18} /> },
+    { href: "/historico-escola", label: "Histórico Escolar", icon: <FileText size={18} /> },
+    { href: "/calendario", label: "Calendário", icon: <Calendar size={18} /> },
   ],
   responsavel: [
-    { href: "/mural/responsavel", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    { href: "/mural", label: "Mural", icon: <LayoutDashboard size={18} /> },
     { href: "/boletim", label: "Boletim", icon: <FileText size={18} /> },
-    { href: "/avisos", label: "Avisos", icon: <Bell size={18} /> },
+    { href: "/provas", label: "Provas", icon: <ClipboardList size={18} /> },
     { href: "/calendario", label: "Calendário", icon: <Calendar size={18} /> },
+    { href: "/avisos", label: "Avisos e Reunião", icon: <Bell size={18} /> },
+    { href: "/historico-medico", label: "Histórico Médico", icon: <Heart size={18} /> },
+    { href: "/historico-escola", label: "Histórico Escolar", icon: <FileText size={18} /> },
   ],
   professor: [
-    { href: "/mural/professor", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/atividades", label: "Atividades", icon: <BookOpen size={18} /> },
-    { href: "/calendario", label: "Calendário", icon: <Calendar size={18} /> },
+    { href: "/mural", label: "Mural", icon: <LayoutDashboard size={18} /> },
+    { href: "/atividades", label: "Criar Atividades", icon: <BookOpen size={18} /> },
+    { href: "/provas", label: "Criar Provas", icon: <FileText size={18} /> },
+    { href: "/boletim", label: "Lançar Notas", icon: <ClipboardList size={18} /> },
+    { href: "/criar-calendario", label: "Calendário / Presença", icon: <Calendar size={18} /> },
+    { href: "/avisos", label: "Enviar Avisos", icon: <Bell size={18} /> },
   ],
   gestor: [
-    { href: "/mural/gestor", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    { href: "/mural", label: "Mural", icon: <LayoutDashboard size={18} /> },
     { href: "/gerenciar-usuarios", label: "Usuários", icon: <Users size={18} /> },
     { href: "/gerenciar-atividades", label: "Atividades", icon: <ClipboardList size={18} /> },
+    { href: "/provas", label: "Provas", icon: <FileText size={18} /> },
     { href: "/relatorios", label: "Relatórios", icon: <BarChart3 size={18} /> },
     { href: "/criar-calendario", label: "Calendário", icon: <Calendar size={18} /> },
-    { href: "/criar-horarios", label: "Horários", icon: <Clock size={18} /> },
+    { href: "/criar-horarios", label: "Grade de Horários", icon: <Clock size={18} /> },
+    { href: "/avisos", label: "Envio de Avisos", icon: <Bell size={18} /> },
   ],
 };
 
@@ -78,66 +102,52 @@ const roleColors: Record<UserRole, string> = {
   gestor: "#3B4FD8",
 };
 
-const roleLabels: Record<UserRole, string> = {
-  aluno: "Aluno",
-  responsavel: "Responsável",
-  professor: "Professor",
-  gestor: "Gestor",
-};
-
 const DRAWER_WIDTH = 280;
 
-// ---- Drawer Content ----
-function DrawerContent({
-  items,
-  accentColor,
-  pathname,
-  user,
-  onLogout,
-  onNavClick,
-}: {
-  items: { href: string; label: string; icon: React.ReactNode }[];
-  accentColor: string;
-  pathname: string;
-  user: any;
-  onLogout: () => void;
-  onNavClick: (href: string) => void;
-}) {
+const DrawerContent = ({ items, accentColor, pathname, user, onLogout, onNavClick }: DrawerContentProps) => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        background: "linear-gradient(180deg, #1C1917 0%, #141210 100%)",
+        color: "#f3efea",
+      }}
+    >
       {/* Logo */}
-      <Box sx={{ p: 2, borderBottom: "2px solid #1C1917", display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Avatar sx={{ backgroundColor: accentColor, width: 36, height: 36 }}>
+      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Avatar sx={{ backgroundColor: "#0a37cadc", width: 36, height: 36 }}>
           <GraduationCap size={20} />
         </Avatar>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1C1917", fontFamily: "'Fraunces', serif" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#F3EFEA", fontFamily: "'Fraunces', serif" }}>
             WebSchool
           </Typography>
-          <Typography variant="caption" sx={{ color: "#1C1917", opacity: 0.4 }}>
+          <Typography variant="caption" sx={{ color: "#F3EFEA", opacity: 0.6 }}>
             Plataforma Educacional
           </Typography>
         </Box>
       </Box>
 
       {/* User Profile */}
-      <Box sx={{ p: 2, borderBottom: "1px solid #1C1917", opacity: 0.1 }}>
+      <Box sx={{ p: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Avatar sx={{ backgroundColor: accentColor, width: 40, height: 40, fontSize: "0.875rem", fontWeight: 700 }}>
-            {user?.avatarInitials}
+          <Avatar sx={{ backgroundColor: roleColors[user.role], width: 40, height: 40, fontSize: "0.875rem", fontWeight: 700 }}>
+            {user?.nome.charAt(0)}
           </Avatar>
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: "#1C1917", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "#F3EFEA", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {user?.nome}
             </Typography>
             <Chip
-              label={roleLabels[user?.role] || ""}
+              label={user?.role ? USER_ROLE_LABELS[user.role] : ""}
               size="small"
               sx={{
                 height: 20,
                 fontSize: "0.7rem",
-                backgroundColor: accentColor + "20",
-                color: accentColor,
+                backgroundColor: "#E9D5FF",
+                color: "#4C1D95",
                 fontWeight: 500,
               }}
             />
@@ -145,47 +155,53 @@ function DrawerContent({
         </Box>
       </Box>
 
-      {/* Navigation Menu */}
-      <List sx={{ flex: 1, p: 1, overflowY: "auto" }}>
-        {items.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <ListItemButton
-              key={item.href}
-              onClick={() => onNavClick(item.href)}
-              sx={{
-                mb: 0.5,
-                borderRadius: 1.5,
-                backgroundColor: isActive ? accentColor : "transparent",
-                color: isActive ? "#FFFFFF" : "#1C1917",
-                opacity: isActive ? 1 : 0.7,
-                "&:hover": {
-                  backgroundColor: isActive ? accentColor : "#1C1917",
-                  opacity: 1,
-                  color: "#FFFFFF",
-                },
-                transition: "all 0.3s ease",
-                border: isActive ? `2px solid #1C1917` : "2px solid transparent",
-              }}
-            >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          );
-        })}
+      {/* Menus */}
+      <List sx={{ flex: 1, p: 1, overflow: "auto" }}>
+        {items.map((item) => (
+          <ListItemButton
+            key={item.href}
+            onClick={() => onNavClick(item.href)}
+            sx={{
+              mb: 0.5,
+              borderRadius: 0,
+              backgroundColor: pathname === item.href ? accentColor : "transparent",
+              color: pathname === item.href ? "#fff" : "#f3efea",
+              "&:hover": {
+                backgroundColor: pathname === item.href ? accentColor : "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
+            <ListItemIcon sx={{ color: "inherit", minWidth: 38 }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 500 }} />
+          </ListItemButton>
+        ))}
       </List>
 
       {/* Logout Button */}
-      <Box sx={{ p: 1, borderTop: "1px solid #1C1917", opacity: 0.1 }}>
+      <Box sx={{ p: 1 }}>
+        <ListItemButton
+          onClick={() => onNavClick("/perfil")}
+          sx={{
+            borderRadius: 0,
+            color: "#F3EFEA",
+            mb: 0.5,
+            "&:hover": {
+              backgroundColor: "#ffffff12",
+            },
+          }}
+        >
+          <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+            <UserRound size={18} />
+          </ListItemIcon>
+          <ListItemText primary="Perfil" />
+        </ListItemButton>
         <ListItemButton
           onClick={onLogout}
           sx={{
-            borderRadius: 1.5,
+            borderRadius: 0,
             color: "#DC2626",
             "&:hover": {
-              backgroundColor: "#FEE2E2",
+              backgroundColor: "#ffffff12",
             },
           }}
         >
@@ -197,88 +213,60 @@ function DrawerContent({
       </Box>
     </Box>
   );
-}
+};
 
-// ---- Layout Principal ----
-interface DashboardLayoutProps {
+type DashboardLayoutProps = {
   children: React.ReactNode;
-}
+};
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const { user, logout } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (!user) return null;
+  if (!user) return <>{children}</>;
 
-  const items = menuItems[user.role] ?? [];
-  const accentColor = roleColors[user.role];
+  const items = menuItems[user.role] ?? menuItems.aluno;
+  const accentColor = roleColors[user.role] ?? roleColors.aluno;
+
+  const handleNavClick = (href: string) => {
+    router.push(href);
+    if (isMobile) setMobileOpen(false);
+  };
 
   const handleLogout = () => {
     logout();
     router.push("/login");
   };
 
-  const handleNav = (href: string) => {
-    router.push(href);
-    if (isMobile) setDrawerOpen(false);
-  };
-
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: "#FDFAF5" }}>
-      {/* AppBar */}
-      <AppBar
-        position="fixed"
+    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: "#F6F3EF" }}>
+      <IconButton
+        onClick={() => setMobileOpen(true)}
         sx={{
-          backgroundColor: "#FDFAF5",
-          color: "#1C1917",
-          borderBottom: "2px solid #1C1917",
-          boxShadow: "none",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
+          position: "fixed",
+          top: 12,
+          left: 12,
+          zIndex: 1301,
+          display: { xs: "inline-flex", md: "none" },
+          backgroundColor: "#ffffffd9",
+          border: "1px solid #E7E2DC",
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => setDrawerOpen(true)}
-            sx={{ mr: 2, display: { xs: "block", lg: "none" } }}
-          >
-            <Menu />
-          </IconButton>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
-            <Avatar sx={{ backgroundColor: accentColor, width: 32, height: 32 }}>
-              <GraduationCap size={16} />
-            </Avatar>
-            <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: "'Fraunces', serif" }}>
-              WebSchool
-            </Typography>
-          </Box>
-          <Avatar sx={{ backgroundColor: accentColor, width: 36, height: 36, fontSize: "0.875rem", fontWeight: 700 }}>
-            {user.avatarInitials}
-          </Avatar>
-        </Toolbar>
-      </AppBar>
+        <Menu size={20} />
+      </IconButton>
 
-      {/* Drawer (Sidebar) */}
       <Drawer
-        variant={isMobile ? "temporary" : "permanent"}
-        open={isMobile ? drawerOpen : true}
-        onClose={() => setDrawerOpen(false)}
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
         sx={{
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
-            boxSizing: "border-box",
-            backgroundColor: "#FDFAF5",
-            borderRight: "2px solid #1C1917",
-            marginTop: isMobile ? "64px" : 0,
-            height: isMobile ? `calc(100vh - 64px)` : "100vh",
-          },
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, border: 0, borderRadius: 0 },
         }}
       >
         <DrawerContent
@@ -287,26 +275,39 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           pathname={pathname}
           user={user}
           onLogout={handleLogout}
-          onNavClick={handleNav}
+          onNavClick={handleNavClick}
         />
       </Drawer>
 
-      {/* Main Content */}
+      <Drawer
+        variant="permanent"
+        open
+        sx={{
+          display: { xs: "none", md: "block" },
+          "& .MuiDrawer-paper": { width: DRAWER_WIDTH, border: 0, borderRadius: 0 },
+        }}
+      >
+        <DrawerContent
+          items={items}
+          accentColor={accentColor}
+          pathname={pathname}
+          user={user}
+          onLogout={handleLogout}
+          onNavClick={handleNavClick}
+        />
+      </Drawer>
+
       <Box
         component="main"
         sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          marginTop: isMobile ? "64px" : 0,
-          marginLeft: { xs: 0, lg: `${DRAWER_WIDTH}px` },
+          flexGrow: 1,
+          ml: { md: `${DRAWER_WIDTH}px` },
+          px: { xs: 2, sm: 3 },
+          pt: { xs: 8, md: 3 },
+          pb: 3,
         }}
       >
-        <Box sx={{ flex: 1, p: { xs: 2, md: 4 }, overflowAuto: true }}>
-          <Box sx={{ maxWidth: "1400px", mx: "auto" }}>
-            {children}
-          </Box>
-        </Box>
+        <Box sx={{ width: "100%", maxWidth: 1280, mx: "auto" }}>{children}</Box>
       </Box>
     </Box>
   );

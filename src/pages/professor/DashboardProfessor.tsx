@@ -1,287 +1,716 @@
-"use client";
+﻿"use client";
 
-// ============================================================
-// WebSchool — Dashboard do Professor
-// Design: Academic Warmth — cor âncora: verde #166534
-// ============================================================
-
-import React from "react";
+import React, { useState } from "react";
+import {
+  Avatar,
+  Box,
+  Chip,
+  Container,
+  Divider,
+  Paper,
+  ThemeProvider,
+  Typography,
+  createTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from "@mui/material";
+import {
+  BookOutlined,
+  AssignmentOutlined,
+  NotificationsNoneOutlined,
+  School,
+} from "@mui/icons-material";
 import DashboardLayout from "@/components/DashboardLayout";
-import { StatCard, PageHeader, SectionCard, Badge } from "@/components/ui/stat-card";
 import { useAuth } from "@/lib/context/AuthContext";
-import {
-  mockActivities,
-  mockExams,
-  mockCalendarEvents,
-  mockGrades,
-  mockClassSchedule,
-} from "@/lib/mockData";
-import {
-  BookOpen,
-  FileText,
-  Calendar,
-  Users,
-  TrendingUp,
-  Clock,
-  Plus,
-} from "lucide-react";
+import { mockActivities, mockExams, mockClassStudents, mockNotices } from "@/lib/mockData";
 import { toast } from "sonner";
 
 const ACCENT = "#166534";
 
-const DIAS_PT: Record<string, string> = {
-  segunda: "Segunda",
-  terca: "Terça",
-  quarta: "Quarta",
-  quinta: "Quinta",
-  sexta: "Sexta",
-};
+const theme = createTheme({
+  typography: {
+    fontFamily: "Poppins, sans-serif",
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          border: "1px solid rgba(0,0,0,0.03)",
+        },
+      },
+    },
+  },
+});
+
+// Modal para criar atividade
+function ModalCriarAtividade({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState({
+    titulo: "",
+    disciplina: "",
+    descricao: "",
+    dataEntrega: "",
+  });
+
+  const handleSubmit = () => {
+    if (!form.titulo || !form.disciplina) {
+      toast.error("Preencha título e disciplina.");
+      return;
+    }
+    toast.success("Atividade criada com sucesso!");
+    onClose();
+  };
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700, color: "#1A1A1A" }}>
+        Nova Atividade
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField
+            label="Título"
+            value={form.titulo}
+            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Disciplina"
+            value={form.disciplina}
+            onChange={(e) => setForm({ ...form, disciplina: e.target.value })}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Descrição"
+            value={form.descricao}
+            onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+            fullWidth
+            multiline
+            rows={2}
+            size="small"
+          />
+          <TextField
+            label="Data de Entrega"
+            type="date"
+            value={form.dataEntrega}
+            onChange={(e) => setForm({ ...form, dataEntrega: e.target.value })}
+            fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 2, gap: 1 }}>
+        <Box
+          onClick={onClose}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            border: "1px solid #E5E7EB",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { bgcolor: "#F9F9F9" },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Cancelar
+          </Typography>
+        </Box>
+        <Box
+          onClick={handleSubmit}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            bgcolor: ACCENT,
+            color: "white",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { opacity: 0.9 },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Salvar
+          </Typography>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// Modal para criar prova
+function ModalCriarProva({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState({
+    titulo: "",
+    disciplina: "",
+    data: "",
+    horario: "",
+  });
+
+  const handleSubmit = () => {
+    if (!form.titulo || !form.disciplina || !form.data) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+    toast.success("Prova criada com sucesso!");
+    onClose();
+  };
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700, color: "#1A1A1A" }}>
+        Criar Prova
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField
+            label="Título"
+            value={form.titulo}
+            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Disciplina"
+            value={form.disciplina}
+            onChange={(e) => setForm({ ...form, disciplina: e.target.value })}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Data"
+            type="date"
+            value={form.data}
+            onChange={(e) => setForm({ ...form, data: e.target.value })}
+            fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="Horário"
+            type="time"
+            value={form.horario}
+            onChange={(e) => setForm({ ...form, horario: e.target.value })}
+            fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 2, gap: 1 }}>
+        <Box
+          onClick={onClose}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            border: "1px solid #E5E7EB",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { bgcolor: "#F9F9F9" },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Cancelar
+          </Typography>
+        </Box>
+        <Box
+          onClick={handleSubmit}
+          sx={{
+            flex: 1,
+            py: 1,
+            px: 2,
+            bgcolor: ACCENT,
+            color: "white",
+            borderRadius: 1,
+            textAlign: "center",
+            cursor: "pointer",
+            "&:hover": { opacity: 0.9 },
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            Salvar
+          </Typography>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  );
+}
 
 export default function DashboardProfessor() {
   const { user } = useAuth();
+  const [modalAtividade, setModalAtividade] = useState(false);
+  const [modalProva, setModalProva] = useState(false);
 
   const today = new Date();
   const greeting =
-    today.getHours() < 12 ? "Bom dia" : today.getHours() < 18 ? "Boa tarde" : "Boa noite";
+    today.getHours() < 12
+      ? "Bom dia"
+      : today.getHours() < 18
+      ? "Boa tarde"
+      : "Boa noite";
+
+  const turma = user?.turma ?? "9º A";
+  const disciplinas = user?.disciplinas ?? ["Matemática"];
 
   // Estatísticas
   const totalActivities = mockActivities.length;
   const totalExams = mockExams.length;
   const avgGrade =
-    mockGrades.reduce((acc, g) => acc + (g.media || 0), 0) / mockGrades.length;
+    mockClassStudents.length > 0
+      ? mockClassStudents.reduce((sum, s) => sum + (s.media ?? 0), 0) /
+        mockClassStudents.length
+      : 0;
 
-  // Próximos eventos
-  const upcomingEvents = mockCalendarEvents
-    .filter((e) => new Date(e.data) >= today)
-    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
-    .slice(0, 4);
+  // Dados para exibir
+  const recentActivities = mockActivities.slice(0, 4);
+  const nextExams = mockExams.slice(0, 3);
+  const myNotices = mockNotices.slice(0, 2);
 
-  // Horário de hoje
-  const weekdays = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
-  const todayKey = weekdays[today.getDay()];
-  const todaySchedule = mockClassSchedule.horarios.find((h) => h.dia === todayKey);
+  const sectionTitle = {
+    fontWeight: 700,
+    letterSpacing: "0.05em",
+    fontSize: "1.1rem",
+    color: ACCENT,
+    mb: 2,
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+  };
+
+  const statCards = [
+    {
+      title: "Atividades",
+      value: totalActivities,
+      subtitle: "Criadas",
+      icon: <BookOutlined />,
+      color: "#D1FAE5",
+      textColor: "#065F46",
+    },
+    {
+      title: "Provas",
+      value: totalExams,
+      subtitle: "Agendadas",
+      icon: <AssignmentOutlined />,
+      color: "#FEF9C3",
+      textColor: "#92400E",
+    },
+    {
+      title: "Média Turma",
+      value: avgGrade.toFixed(1),
+      subtitle: "Todos os alunos",
+      icon: <BookOutlined />,
+      color: "#E0E7FF",
+      textColor: "#4338CA",
+    },
+    {
+      title: "Alunos",
+      value: mockClassStudents.length,
+      subtitle: `Turma ${turma}`,
+      icon: <School />,
+      color: "#F3E5F5",
+      textColor: "#6B21A8",
+    },
+  ];
 
   return (
-    <DashboardLayout>
-      <PageHeader
-        title={`${greeting}, ${user?.nome.split(" ")[0]}!`}
-        subtitle={`Turma ${user?.turma ?? ""} · Professor(a)`}
-        accentColor={ACCENT}
-      />
+    <ThemeProvider theme={theme}>
+      <DashboardLayout>
+        {modalAtividade && (
+          <ModalCriarAtividade onClose={() => setModalAtividade(false)} />
+        )}
+        {modalProva && <ModalCriarProva onClose={() => setModalProva(false)} />}
 
-      {/* Stats principais */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          title="Atividades"
-          value={totalActivities}
-          subtitle="Criadas este bimestre"
-          icon={<BookOpen size={16} />}
-          accentColor={ACCENT}
-        />
-        <StatCard
-          title="Provas"
-          value={totalExams}
-          subtitle="Agendadas"
-          icon={<FileText size={16} />}
-          accentColor="#B45309"
-        />
-        <StatCard
-          title="Média da Turma"
-          value={avgGrade.toFixed(1)}
-          subtitle="9º A — todas as disciplinas"
-          icon={<TrendingUp size={16} />}
-          accentColor="#3B4FD8"
-        />
-        <StatCard
-          title="Alunos"
-          value={32}
-          subtitle="Na turma 9º A"
-          icon={<Users size={16} />}
-          accentColor="#6B21A8"
-        />
-      </div>
+        <Box sx={{ width: "100%", fontFamily: "Poppins, sans-serif" }}>
+          <Container maxWidth="lg">
+            {/* HEADER */}
+            <Box sx={{ mb: 5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+                <Avatar sx={{ bgcolor: ACCENT, width: 48, height: 48 }}>
+                  <School sx={{ color: "white" }} />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" fontWeight="bold" color="#1A1A1A">
+                    {greeting}, {user?.nome.split(" ")[0]}!
+                  </Typography>
+                  <Typography variant="body1" color="#666">
+                    Turma {turma} · {disciplinas.join(", ")}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider
+                sx={{
+                  borderColor: ACCENT,
+                  width: "100px",
+                  mt: 2,
+                  borderBottomWidth: "2px",
+                }}
+              />
+            </Box>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Atividades recentes */}
-        <div className="lg:col-span-2">
-          <SectionCard
-            title="Atividades da Turma"
-            action={
-              <button
-                onClick={() => toast.info("Formulário de criação disponível em breve.")}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#166534] text-white text-xs font-semibold rounded-lg border border-[#1C1917] hover:bg-[#14532D] transition-all"
-                style={{ boxShadow: "2px 2px 0px #1C1917" }}
-              >
-                <Plus size={12} />
-                Nova Atividade
-              </button>
-            }
-          >
-            <div className="space-y-3">
-              {mockActivities.map((activity) => {
-                const statusConfig = {
-                  entregue: { color: "#166534", label: "Entregue" },
-                  atrasado: { color: "#DC2626", label: "Atrasado" },
-                  pendente: { color: "#B45309", label: "Pendente" },
-                };
-                const config = statusConfig[activity.status];
-                return (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-3 p-3 rounded-xl border border-[#1C1917]/10 hover:border-[#1C1917]/25 transition-all"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1C1917]">{activity.titulo}</p>
-                      <p className="text-xs text-[#1C1917]/50 mt-0.5 line-clamp-1">
-                        {activity.descricao}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <Badge color={ACCENT}>{activity.disciplina}</Badge>
-                        <span className="text-xs text-[#1C1917]/40">
-                          Entrega: {new Date(activity.dataEntrega).toLocaleDateString("pt-BR")}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <Badge color={config.color}>{config.label}</Badge>
-                      {activity.nota && (
-                        <span className="text-xs font-bold text-green-700">
-                          Nota: {activity.nota}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </SectionCard>
-        </div>
-
-        {/* Próximas provas */}
-        <SectionCard
-          title="Provas Agendadas"
-          action={
-            <button
-              onClick={() => toast.info("Formulário de prova disponível em breve.")}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#B45309] text-white text-xs font-semibold rounded-lg border border-[#1C1917] hover:bg-[#92400E] transition-all"
-              style={{ boxShadow: "2px 2px 0px #1C1917" }}
+            {/* TOP CARDS */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(4, 1fr)",
+                },
+                gap: 3,
+                mb: 5,
+              }}
             >
-              <Plus size={12} />
-              Nova Prova
-            </button>
-          }
-        >
-          <div className="space-y-3">
-            {mockExams.map((exam) => (
-              <div
-                key={exam.id}
-                className="p-3 rounded-xl bg-amber-50 border border-amber-200"
-              >
-                <p className="text-sm font-semibold text-[#1C1917]">{exam.disciplina}</p>
-                <p className="text-xs text-[#1C1917]/60 mt-0.5 truncate">{exam.titulo}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge color="#B45309">
-                    {new Date(exam.data).toLocaleDateString("pt-BR")}
-                  </Badge>
-                  <span className="text-xs text-[#1C1917]/50">{exam.sala}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Horário de hoje */}
-        <SectionCard title={`Suas Aulas Hoje — ${DIAS_PT[todayKey] ?? "Hoje"}`}>
-          {todaySchedule ? (
-            <div className="space-y-2">
-              {todaySchedule.aulas
-                .filter((a) => a.professor === user?.nome)
-                .map((aula, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-3 p-2.5 rounded-lg bg-green-50 border border-green-200"
-                  >
-                    <div className="flex items-center gap-1.5 text-xs text-green-700 w-28 flex-shrink-0">
-                      <Clock size={12} />
-                      {aula.horario}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1C1917] truncate">
-                        {aula.disciplina}
-                      </p>
-                      <p className="text-xs text-[#1C1917]/40">{aula.sala}</p>
-                    </div>
-                  </div>
-                ))}
-              {todaySchedule.aulas.filter((a) => a.professor === user?.nome).length === 0 && (
-                <div className="text-center py-6">
-                  <Calendar size={28} className="text-[#1C1917]/20 mx-auto mb-2" />
-                  <p className="text-sm text-[#1C1917]/40">Sem aulas suas hoje</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Calendar size={32} className="text-[#1C1917]/20 mx-auto mb-2" />
-              <p className="text-sm text-[#1C1917]/40">Sem aulas hoje</p>
-            </div>
-          )}
-        </SectionCard>
-
-        {/* Próximos eventos */}
-        <SectionCard title="Próximos Eventos">
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start gap-3 p-3 rounded-xl border border-[#1C1917]/10"
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex flex-col items-center justify-center flex-shrink-0 border-2 border-[#1C1917]"
-                  style={{
-                    backgroundColor:
-                      event.tipo === "prova"
-                        ? "#FEF3C7"
-                        : event.tipo === "reuniao"
-                        ? "#EFF6FF"
-                        : event.tipo === "aula"
-                        ? "#F0FDF4"
-                        : "#FAF5FF",
+              {statCards.map((card, index) => (
+                <Paper
+                  key={index}
+                  sx={{
+                    p: 3,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+                      boxShadow: "0 10px 25px rgba(22, 101, 52, 0.15)",
+                    },
+                    position: "relative",
                   }}
                 >
-                  <span className="text-xs font-bold text-[#1C1917] leading-none">
-                    {new Date(event.data).getDate()}
-                  </span>
-                  <span className="text-[10px] text-[#1C1917]/50 leading-none">
-                    {new Date(event.data).toLocaleString("pt-BR", { month: "short" })}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1C1917] truncate">{event.titulo}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <Badge
-                      color={
-                        event.tipo === "prova"
-                          ? "#B45309"
-                          : event.tipo === "reuniao"
-                          ? "#3B4FD8"
-                          : event.tipo === "aula"
-                          ? "#166534"
-                          : "#6B21A8"
-                      }
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                  >
+                    <Box
+                      position="absolute"
+                      left={0}
+                      top={0}
+                      bottom={0}
+                      sx={{ width: "8px" }}
+                      bgcolor={card.textColor}
+                    />
+                    <Typography
+                      variant="overline"
+                      sx={{
+                        fontWeight: 700,
+                        letterSpacing: 1,
+                        color: "#888",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                      }}
                     >
-                      {event.tipo}
-                    </Badge>
-                    <span className="text-xs text-[#1C1917]/40">{event.horario}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-      </div>
-    </DashboardLayout>
+                      {card.title}
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 2,
+                        bgcolor: card.color,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: card.textColor,
+                      }}
+                    >
+                      {card.icon}
+                    </Box>
+                  </Box>
+
+                  <Box mt={2}>
+                    <Typography
+                      variant="h3"
+                      fontWeight="bold"
+                      color="#1A1A1A"
+                    >
+                      {card.value}
+                    </Typography>
+                    <Typography variant="body2" color="#666">
+                      {card.subtitle}
+                    </Typography>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+
+            {/* MAIN GRID */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" },
+                gap: 4,
+              }}
+            >
+              {/* Atividades Recentes */}
+              <Paper sx={{ p: 4, height: "fit-content" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 3,
+                  }}
+                >
+                  <Typography sx={sectionTitle}>
+                    <BookOutlined sx={{ fontSize: 20 }} />
+                    Atividades Recentes
+                  </Typography>
+                  <Box
+                    onClick={() => setModalAtividade(true)}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      bgcolor: ACCENT,
+                      color: "white",
+                      borderRadius: 1.5,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      "&:hover": { opacity: 0.9 },
+                    }}
+                  >
+                    Nova Atividade
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {recentActivities.map((activity) => (
+                    <Box
+                      key={activity.id}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "white",
+                        border: "1px solid #eee",
+                        transition: "background 0.2s",
+                        "&:hover": { bgcolor: "#FAFAFA" },
+                      }}
+                    >
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            bgcolor:
+                              activity.status === "pendente"
+                                ? "#F59E0B"
+                                : "#10B981",
+                          }}
+                        />
+                        <Box>
+                          <Typography
+                            fontWeight="bold"
+                            variant="body1"
+                            color="#1A1A1A"
+                          >
+                            {activity.titulo}
+                          </Typography>
+                          <Typography variant="body2" color="#757575">
+                            {activity.disciplina}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <Chip
+                          label={
+                            activity.status.charAt(0).toUpperCase() +
+                            activity.status.slice(1)
+                          }
+                          size="small"
+                          sx={{
+                            bgcolor:
+                              activity.status === "pendente"
+                                ? "#FEF3C7"
+                                : "#D1FAE5",
+                            color:
+                              activity.status === "pendente"
+                                ? "#92400E"
+                                : "#166534",
+                            fontWeight: 600,
+                            height: 32,
+                          }}
+                        />
+                        <Typography variant="caption" color="#888">
+                          {activity.dataEntrega}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Paper>
+
+              {/* Coluna Lateral */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                  width: "100%",
+                }}
+              >
+                {/* Próximas Provas */}
+                <Paper sx={{ p: 3 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography sx={sectionTitle}>
+                      <AssignmentOutlined sx={{ fontSize: 20 }} />
+                      Próximas Provas
+                    </Typography>
+                    <Box
+                      onClick={() => setModalProva(true)}
+                      sx={{
+                        px: 1.5,
+                        py: 0.5,
+                        bgcolor: ACCENT,
+                        color: "white",
+                        borderRadius: 1,
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        "&:hover": { opacity: 0.9 },
+                      }}
+                    >
+                      Nova
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {nextExams.map((exam) => (
+                      <Box
+                        key={exam.id}
+                        sx={{
+                          p: 2,
+                          bgcolor: "#FEF9C3",
+                          borderRadius: 2,
+                          border: "1px solid #FDE68A",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="#92400E"
+                          fontWeight="bold"
+                          textTransform="uppercase"
+                          fontSize="0.75rem"
+                        >
+                          {exam.disciplina}
+                        </Typography>
+                        <Typography
+                          fontWeight="bold"
+                          variant="body1"
+                          color="#1A1A1A"
+                          mb={0.5}
+                        >
+                          {exam.titulo}
+                        </Typography>
+                        <Box mt={1} display="flex" alignItems="center" gap={1}>
+                          <Chip
+                            label={exam.data}
+                            size="small"
+                            sx={{
+                              bgcolor: "white",
+                              fontWeight: 600,
+                              fontSize: "0.75rem",
+                            }}
+                          />
+                          <Typography variant="caption" color="#666">
+                            {exam.horario}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Paper>
+
+                {/* Avisos */}
+                <Paper sx={{ p: 3, flex: 1 }}>
+                  <Typography sx={sectionTitle}>
+                    <NotificationsNoneOutlined sx={{ fontSize: 20 }} />
+                    Avisos
+                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {myNotices.map((notice) => (
+                      <Box
+                        key={notice.id}
+                        sx={{
+                          p: 2,
+                          bgcolor: "white",
+                          borderRadius: 2,
+                          border: "1px solid #E5E7EB",
+                          cursor: "pointer",
+                          transition: "border-color 0.2s",
+                          "&:hover": { borderColor: ACCENT },
+                        }}
+                      >
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          mb={1}
+                        >
+                          <Typography
+                            variant="caption"
+                            fontWeight="bold"
+                            color={ACCENT}
+                          >
+                            {notice.tipo}
+                          </Typography>
+                          <Typography variant="caption" color="#999">
+                            {notice.data}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          fontWeight="bold"
+                          mb={0.5}
+                        >
+                          {notice.titulo}
+                        </Typography>
+                        {notice.mensagem && (
+                          <Typography
+                            variant="body2"
+                            color="#555"
+                            sx={{
+                              fontSize: "0.9rem",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {notice.mensagem}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                </Paper>
+              </Box>
+            </Box>
+          </Container>
+        </Box>
+      </DashboardLayout>
+    </ThemeProvider>
   );
 }

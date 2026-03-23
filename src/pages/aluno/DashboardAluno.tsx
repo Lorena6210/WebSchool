@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -24,8 +24,14 @@ import {
 } from '@mui/icons-material';
 import { useTheme as useMUITheme } from "@mui/material/styles";
 import { useAuth } from '@/lib/context/AuthContext';
-import { mockActivities, mockExams, mockGrades, mockNotices } from '@/lib/mockData';
-import LayoutAluno from '@/components/layout/LayoutAluno';
+import { MockAPI } from '@/lib/mockData';
+import type {
+  Activity,
+  Exam,
+  Grade,
+  Notice,
+} from "@/types";
+import DashboardLayout from '@/components/DashboardLayout';
 
 // Cor de destaque da marca
 const ACCENT = '#6B21A8';
@@ -60,6 +66,12 @@ const theme = createTheme({
 const DashboardAluno = () => {
   const { user } = useAuth();
   const muiTheme = useMUITheme();
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const today = new Date();
   
   const greeting =
@@ -68,13 +80,42 @@ const DashboardAluno = () => {
       : today.getHours() < 18
         ? 'Boa tarde'
         : 'Boa noite';
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [
+          activitiesData,
+          examsData,
+          gradesData,
+          noticesData,
+        ] = await Promise.all([
+          MockAPI.academic.getActivities(),
+          MockAPI.academic.getExams(),
+          MockAPI.academic.getGrades(),
+          MockAPI.notices.getAll(),
+        ]);
+        setActivities(activitiesData);
+        setExams(examsData);
+        setGrades(gradesData);
+        setNotices(noticesData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do dashboard do aluno:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Lógica de Dados
-  const pendingActivities = mockActivities.filter((a) => a.status === 'pendente');
-  const lateActivities = mockActivities.filter((a) => a.status === 'atrasado');
-  const nextExams = mockExams.slice(0, 3);
-  const unreadNotices = mockNotices.filter(n => n.destinatarios.includes('aluno')).length;
-  const avgGrade = mockGrades.reduce((acc, g) => acc + (g.media || 0), 0) / mockGrades.length;
+  const pendingActivities = activities.filter((a) => a.status === 'pendente');
+  const lateActivities = activities.filter((a) => a.status === 'atrasado');
+  const nextExams = exams.slice(0, 3);
+  const unreadNotices = notices.filter(n => n.destinatarios.includes('aluno')).length;
+  const avgGrade = grades.length > 0 ? grades.reduce((acc, g) => acc + (g.media || 0), 0) / grades.length : 0;
 
   // Estilos de Seção
   const sectionTitle = {
@@ -88,26 +129,26 @@ const DashboardAluno = () => {
     gap: 1,
   };
 
-  function getLeftAccent(
-  status: AulaDigitalItem['statusClass'],
-  isLive?: boolean
-) {
-  if (status === 'NOVA') return '#69BD45';
-  if (status === 'JA_ABERTA') return '#666666';
-  if (status === 'COM_RESPOSTA') return '#EAD308';
-  return '#CBD5E0'; // cinza
-}
+  if (isLoading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <DashboardLayout>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', bgcolor: "#F9F6F1" }}>
+            <Typography color="#666">
+              Carregando seu dashboard...
+            </Typography>
+          </Box>
+        </DashboardLayout>
+      </ThemeProvider>
+    );
+  }
 
-const accent = getLeftAccent(item.statusClass, item.isLive);
   return (
     <ThemeProvider theme={theme}>
-      <LayoutAluno>
+      <DashboardLayout>
         <Box sx={{
           width: "100%",
-          bgcolor: "#F9F6F1",
-          minHeight: "100vh",
-          py: { xs: 3, md: 6 },
-          px: { xs: 2, md: 4 },
+          // bgcolor: "#F9F6F1",
           fontFamily: "Poppins, sans-serif"
         }}>
           <Container maxWidth="lg">
@@ -178,7 +219,8 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
                       "&:hover": {
                         transform: "translateY(-5px)",
                         boxShadow: "0 10px 25px rgba(107, 33, 168, 0.15)",
-                      }
+                      },
+                      position: 'relative',
                     }}
                   >
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start">
@@ -188,8 +230,8 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
                       top={0}
                       bottom={0}
                       w="8px"
-                      bg={accent}
-                    />
+                      bgcolor={card.textColor}
+                     />
                       <Typography
                         variant="overline"
                         sx={{
@@ -248,7 +290,7 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
                   </Box>
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {mockActivities.map((activity) => (
+                    {activities.slice(0, 4).map((activity) => (
                       <Box 
                         key={activity.titulo}
                         sx={{
@@ -292,7 +334,7 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
                             }}
                           />
                           <Typography variant="caption" color="#888">
-                            {activity.data}
+                             {activity.dataEntrega}
                           </Typography>
                         </Box>
                       </Box>
@@ -373,7 +415,7 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
                       Avisos Importantes
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {mockNotices.slice(0, 2).map(notice => (
+                      {notices.filter(n => n.destinatarios.includes('aluno')).slice(0, 2).map(notice => (
                         <Box 
                           key={notice.id}
                           sx={{
@@ -413,7 +455,7 @@ const accent = getLeftAccent(item.statusClass, item.isLive);
 
           </Container>
         </Box>
-      </LayoutAluno>
+      </DashboardLayout>
     </ThemeProvider>
   );
 };

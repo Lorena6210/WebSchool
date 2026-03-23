@@ -9,7 +9,7 @@ import HistoricoMedico from "@/pages/HistoricoMedico";
 
 export default function HistoricoMedicoPage() {
   return (
-    <ProtectedRoute allowedRoles={["aluno"]}>
+    <ProtectedRoute allowedRoles={["aluno", "responsavel"]}>
       <HistoricoMedico />
     </ProtectedRoute>
   );

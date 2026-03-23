@@ -3,7 +3,8 @@
 // Design: Academic Warmth (Neobrutalism Educacional Suave)
 // ============================================================
 
-export type UserRole = "aluno" | "professor" | "responsavel" | "gestor";
+import type { UserRole } from "./roles";
+export type { UserRole } from "./roles";
 
 export interface User {
   id: string;
@@ -13,6 +14,12 @@ export interface User {
   role: UserRole;
   turma?: string;
   avatarInitials: string;
+  // Responsável: ID do aluno que este usuário é responsável
+  alunoId?: string;
+  // Professor: disciplinas que leciona
+  disciplinas?: string[];
+  // Professor: bimestre atual
+  bimestre?: number;
 }
 
 export interface Permissions {
@@ -85,7 +92,6 @@ export interface CalendarEvent {
 }
 
 export interface Activity {
-  data: ReactNode;
   id: string;
   titulo: string;
   descricao: string;

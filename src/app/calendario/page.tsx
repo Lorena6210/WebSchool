@@ -1,7 +1,12 @@
 "use client";
 
-import CalendarioRoot from "./index";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Calendario from "@/features/Calendario";
 
 export default function CalendarioPage() {
-  return <CalendarioRoot />;
+  return (
+    <ProtectedRoute allowedRoles={["aluno", "responsavel"]}>
+      <Calendario />
+    </ProtectedRoute>
+  );
 }

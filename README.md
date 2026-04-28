@@ -65,7 +65,7 @@ src/
 │   │   └── ThemeContext.tsx# Tema (claro/escuro)
 │   ├── mockData.ts         # Dados de demonstração
 │   └── utils.ts            # Utilitários (cn, etc.)
-├── pages/                  # Componentes de página por perfil
+├── features/               # Componentes de página por perfil
 │   ├── aluno/
 │   │   └── DashboardAluno.tsx
 │   ├── professor/

@@ -33,7 +33,7 @@ export default function Home() {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        backgroundColor: "#FDFAF5",
+        backgroundColor: "#0c0c14",
       }}
     >
       <CircularProgress />

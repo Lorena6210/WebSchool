@@ -5,7 +5,7 @@
 // ============================================================
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Avisos from "@/pages/responsavel/Avisos";
+import Avisos from "@/features/responsavel/Avisos";
 
 export default function AvisosPage() {
   return (

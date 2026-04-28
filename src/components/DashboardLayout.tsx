@@ -8,6 +8,7 @@
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
+import { useTheme as useAppTheme } from "@/lib/context/ThemeContext";
 import {
   Drawer,
   Box,
@@ -19,7 +20,7 @@ import {
   Typography,
   IconButton,
   useMediaQuery,
-  useTheme,
+  useTheme as useMuiTheme,
   Chip,
 } from "@mui/material";
 import {
@@ -37,9 +38,12 @@ import {
   GraduationCap,
   LogOut,
   Menu,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { USER_ROLE_LABELS } from "@/types";
 import type { UserRole } from "@/types";
+import { ROLE_ACCENT_COLORS } from "@/lib/theme/roleAccent";
 
 type MenuItem = { href: string; label: string; icon: React.ReactNode };
 
@@ -47,6 +51,8 @@ type DrawerContentProps = {
   items: { href: string; label: string; icon: React.ReactNode }[];
   accentColor: string;
   pathname: string;
+  isDark: boolean;
+  onToggleTheme: () => void;
   user: {
     nome: string;
     role: UserRole;
@@ -95,60 +101,119 @@ const menuItems: Record<UserRole, MenuItem[]> = {
   ],
 };
 
-const roleColors: Record<UserRole, string> = {
-  aluno: "#6B21A8",
-  responsavel: "#B45309",
-  professor: "#166534",
-  gestor: "#3B4FD8",
-};
+const roleColors: Record<UserRole, string> = ROLE_ACCENT_COLORS;
 
 const DRAWER_WIDTH = 280;
 
-const DrawerContent = ({ items, accentColor, pathname, user, onLogout, onNavClick }: DrawerContentProps) => {
+const DrawerContent = ({
+  items,
+  accentColor,
+  pathname,
+  isDark,
+  onToggleTheme,
+  user,
+  onLogout,
+  onNavClick,
+}: DrawerContentProps) => {
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        background: "linear-gradient(180deg, #1C1917 0%, #141210 100%)",
-        color: "#f3efea",
+        background: isDark
+          ? "linear-gradient(180deg, #0c0c14 0%, #10101c 100%)"
+          : "linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%)",
+        color: isDark ? "#f0f0f8" : "#0f2747",
+        borderRight: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(15,39,71,0.1)",
       }}
     >
       {/* Logo */}
-      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Avatar sx={{ backgroundColor: "#0a37cadc", width: 36, height: 36 }}>
+      <Box
+        sx={{
+          p: 2.5,
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          borderBottom: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(15,39,71,0.1)",
+        }}
+      >
+        <Avatar sx={{
+          background: isDark
+            ? "linear-gradient(135deg, #e5244a 0%, #c01a3a 100%)"
+            : "linear-gradient(135deg, #1c4f82 0%, #0f2747 100%)",
+          width: 36, height: 36,
+          boxShadow: isDark ? "0 0 16px rgba(229,36,74,0.4)" : "0 0 16px rgba(15,39,71,0.3)",
+        }}>
           <GraduationCap size={20} />
         </Avatar>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#F3EFEA", fontFamily: "'Fraunces', serif" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: isDark ? "#f0f0f8" : "#0f2747",
+              fontFamily: "'Fraunces', serif",
+              fontSize: 16,
+            }}
+          >
             WebSchool
           </Typography>
-          <Typography variant="caption" sx={{ color: "#F3EFEA", opacity: 0.6 }}>
+          <Typography variant="caption" sx={{ color: isDark ? "rgba(240,240,248,0.4)" : "rgba(15,39,71,0.55)", fontSize: 10 }}>
             Plataforma Educacional
           </Typography>
         </Box>
+        <IconButton
+          onClick={onToggleTheme}
+          size="small"
+          sx={{
+            ml: "auto",
+            bgcolor: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,39,71,0.08)",
+            border: "1px solid",
+            borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(15,39,71,0.18)",
+            color: isDark ? "#f0f0f8" : "#0f2747",
+            "&:hover": {
+              bgcolor: isDark ? "rgba(255,255,255,0.12)" : "rgba(15,39,71,0.14)",
+            },
+          }}
+        >
+          {isDark ? <Sun size={15} /> : <Moon size={15} />}
+        </IconButton>
       </Box>
 
       {/* User Profile */}
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, borderBottom: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(15,39,71,0.1)" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Avatar sx={{ backgroundColor: roleColors[user.role], width: 40, height: 40, fontSize: "0.875rem", fontWeight: 700 }}>
+          <Avatar sx={{
+            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
+            width: 40, height: 40, fontSize: "0.875rem", fontWeight: 700,
+            boxShadow: `0 0 12px ${accentColor}55`,
+          }}>
             {user?.nome.charAt(0)}
           </Avatar>
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: "#F3EFEA", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600,
+                color: isDark ? "#f0f0f8" : "#0f2747",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {user?.nome}
             </Typography>
             <Chip
               label={user?.role ? USER_ROLE_LABELS[user.role] : ""}
               size="small"
               sx={{
-                height: 20,
-                fontSize: "0.7rem",
-                backgroundColor: "#E9D5FF",
-                color: "#4C1D95",
-                fontWeight: 500,
+                height: 18,
+                fontSize: "0.65rem",
+                backgroundColor: `${accentColor}22`,
+                color: accentColor,
+                fontWeight: 600,
+                border: `1px solid ${accentColor}44`,
               }}
             />
           </Box>
@@ -163,52 +228,58 @@ const DrawerContent = ({ items, accentColor, pathname, user, onLogout, onNavClic
             onClick={() => onNavClick(item.href)}
             sx={{
               mb: 0.5,
-              borderRadius: 0,
-              backgroundColor: pathname === item.href ? accentColor : "transparent",
-              color: pathname === item.href ? "#fff" : "#f3efea",
+              borderRadius: "8px",
+              backgroundColor: pathname === item.href ? `${accentColor}22` : "transparent",
+              color: pathname === item.href ? accentColor : (isDark ? "rgba(240,240,248,0.65)" : "rgba(15,39,71,0.72)"),
+              borderLeft: pathname === item.href ? `3px solid ${accentColor}` : "3px solid transparent",
               "&:hover": {
-                backgroundColor: pathname === item.href ? accentColor : "rgba(255, 255, 255, 0.1)",
+                backgroundColor: pathname === item.href
+                  ? `${accentColor}28`
+                  : (isDark ? "rgba(255,255,255,0.05)" : "rgba(15,39,71,0.08)"),
+                color: pathname === item.href ? accentColor : (isDark ? "#f0f0f8" : "#0f2747"),
               },
+              transition: "all 0.2s ease",
             }}
           >
             <ListItemIcon sx={{ color: "inherit", minWidth: 38 }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 500 }} />
+            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: pathname === item.href ? 600 : 400, fontSize: 14 }} />
           </ListItemButton>
         ))}
       </List>
 
       {/* Logout Button */}
-      <Box sx={{ p: 1 }}>
+      <Box sx={{ p: 1, borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(15,39,71,0.1)" }}>
         <ListItemButton
           onClick={() => onNavClick("/perfil")}
           sx={{
-            borderRadius: 0,
-            color: "#F3EFEA",
+            borderRadius: "8px",
+            color: isDark ? "rgba(240,240,248,0.65)" : "rgba(15,39,71,0.72)",
             mb: 0.5,
             "&:hover": {
-              backgroundColor: "#ffffff12",
+              backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(15,39,71,0.08)",
+              color: isDark ? "#f0f0f8" : "#0f2747",
             },
           }}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
             <UserRound size={18} />
           </ListItemIcon>
-          <ListItemText primary="Perfil" />
+          <ListItemText primary="Perfil" primaryTypographyProps={{ fontSize: 14 }} />
         </ListItemButton>
         <ListItemButton
           onClick={onLogout}
           sx={{
-            borderRadius: 0,
-            color: "#DC2626",
+            borderRadius: "8px",
+            color: "#e5244a",
             "&:hover": {
-              backgroundColor: "#ffffff12",
+              backgroundColor: "rgba(229,36,74,0.1)",
             },
           }}
         >
           <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
             <LogOut size={18} />
           </ListItemIcon>
-          <ListItemText primary="Sair" />
+          <ListItemText primary="Sair" primaryTypographyProps={{ fontSize: 14 }} />
         </ListItemButton>
       </Box>
     </Box>
@@ -223,8 +294,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const { user, logout } = useAuth();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { theme, toggleTheme } = useAppTheme();
+  const muiTheme = useMuiTheme();
+  const isDark = theme === "dark";
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!user) return <>{children}</>;
@@ -243,7 +316,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: "#F6F3EF" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: isDark ? "#0c0c14" : "#f2f7ff" }}>
       <IconButton
         onClick={() => setMobileOpen(true)}
         sx={{
@@ -252,8 +325,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           left: 12,
           zIndex: 1301,
           display: { xs: "inline-flex", md: "none" },
-          backgroundColor: "#ffffffd9",
-          border: "1px solid #E7E2DC",
+          backgroundColor: isDark ? "#12121e" : "#ffffff",
+          border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(15,39,71,0.16)",
+          color: isDark ? "#f0f0f8" : "#0f2747",
+          "&:hover": { backgroundColor: isDark ? "#1a1a2c" : "#eef5ff" },
         }}
       >
         <Menu size={20} />
@@ -273,6 +348,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           items={items}
           accentColor={accentColor}
           pathname={pathname}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
           user={user}
           onLogout={handleLogout}
           onNavClick={handleNavClick}
@@ -291,6 +368,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           items={items}
           accentColor={accentColor}
           pathname={pathname}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
           user={user}
           onLogout={handleLogout}
           onNavClick={handleNavClick}
@@ -305,6 +384,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           px: { xs: 2, sm: 3 },
           pt: { xs: 8, md: 3 },
           pb: 3,
+          minHeight: "100vh",
+          backgroundColor: isDark ? "#0c0c14" : "#f2f7ff",
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 1280, mx: "auto" }}>{children}</Box>

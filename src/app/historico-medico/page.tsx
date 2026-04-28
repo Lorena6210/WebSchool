@@ -5,7 +5,7 @@
 // ============================================================
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import HistoricoMedico from "@/pages/HistoricoMedico";
+import HistoricoMedico from "@/features/HistoricoMedico";
 
 export default function HistoricoMedicoPage() {
   return (

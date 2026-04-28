@@ -5,7 +5,7 @@
 // ============================================================
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import GerenciarUsuarios from "@/pages/gestor/GerenciarUsuarios";
+import GerenciarUsuarios from "@/features/gestor/GerenciarUsuarios";
 
 export default function GerenciarUsuariosPage() {
   return (

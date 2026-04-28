@@ -5,7 +5,7 @@
 // ============================================================
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import GerenciarAtividades from "@/pages/gestor/GerenciarAtividades";
+import GerenciarAtividades from "@/features/gestor/GerenciarAtividades";
 
 export default function GerenciarAtividadesPage() {
   return (

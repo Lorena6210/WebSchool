@@ -1,7 +1,12 @@
-'use client';
+"use client";
 
-import MuralRoot from './index';
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Mural from "@/features/Mural";
 
 export default function MuralPage() {
-  return <MuralRoot />;
+  return (
+    <ProtectedRoute>
+      <Mural />
+    </ProtectedRoute>
+  );
 }

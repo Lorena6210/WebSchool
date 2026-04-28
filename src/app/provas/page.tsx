@@ -1,7 +1,12 @@
 "use client";
 
-import ProvasRoot from "./index";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Provas from "@/features/Provas";
 
 export default function ProvasPage() {
-  return <ProvasRoot />;
+  return (
+    <ProtectedRoute allowedRoles={["aluno", "responsavel", "professor", "gestor"]}>
+      <Provas />
+    </ProtectedRoute>
+  );
 }

@@ -4,13 +4,13 @@
 // WebSchool — Relatórios (Next.js App Router)
 // ============================================================
 
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Relatorios from "@/pages/gestor/Relatorios";
+import AppPageShell from "@/components/AppPageShell";
+import Relatorios from "@/features/gestor/Relatorios";
 
 export default function RelatoriosPage() {
   return (
-    <ProtectedRoute allowedRoles={["gestor"]}>
+    <AppPageShell allowedRoles={["gestor"]} withNavbar>
       <Relatorios />
-    </ProtectedRoute>
+    </AppPageShell>
   );
 }

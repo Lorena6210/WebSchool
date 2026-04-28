@@ -1,7 +1,12 @@
 "use client";
 
-import CriarHorariosRoot from "./index";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import CriarHorarios from "@/features/gestor/CriarHorarios";
 
 export default function CriarHorariosPage() {
-  return <CriarHorariosRoot />;
+  return (
+    <ProtectedRoute allowedRoles={["gestor"]}>
+      <CriarHorarios />
+    </ProtectedRoute>
+  );
 }

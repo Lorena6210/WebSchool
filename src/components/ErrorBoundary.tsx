@@ -25,31 +25,29 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex items-center justify-center min-h-screen p-8 bg-background">
-          <div className="flex flex-col items-center w-full max-w-2xl p-8">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: "2rem", backgroundColor: "var(--background)" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "32rem", padding: "2rem" }}>
             <AlertTriangle
+            style={{ color: "var(--destructive)", marginBottom:"1.5rem", flexShrink: 0 }}
               size={48}
-              className="text-destructive mb-6 flex-shrink-0"
             />
 
-            <h2 className="text-xl mb-4">An unexpected error occurred.</h2>
+            <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>Ocorreu um erro inesperado.</h2>
 
-            <div className="p-4 w-full rounded bg-muted overflow-auto mb-6">
-              <pre className="text-sm text-muted-foreground whitespace-break-spaces">
+            <div style={{ padding: "1rem", width: "100%", borderRadius: "0.5rem", backgroundColor: "var(--muted)", overflow: "auto", marginBottom: "1.5rem" }}>
+              <pre style={{ fontSize: "0.875rem", color: "var(--muted-foreground)", whiteSpace: "pre-wrap" }}>
                 {this.state.error?.stack}
               </pre>
             </div>
 
             <button
               onClick={() => window.location.reload()}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg",
-                "bg-primary text-primary-foreground",
-                "hover:opacity-90 cursor-pointer"
-              )}
+              style={{
+                display:"flex", alignItems:"center", padding:"0.5rem 1rem", borderRadius:"0.5rem", backgroundColor:"var(--primary)", color:"var(--primary-foreground)", border:"none", cursor:"pointer"
+              }}
             >
               <RotateCcw size={16} />
-              Reload Page
+              Recarregar Página
             </button>
           </div>
         </div>
